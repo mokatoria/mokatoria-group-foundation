@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+{% block title %}Donate — Give Back{% endblock %}
+
+{% block content %}
+<section class="donate-page">
+  <div class="container donate-grid">
+
+    <div class="donate-intro">
+      <span class="eyebrow"><span></span> Invest in dignity</span>
+
+      <h1>Help turn <em>hope</em> into lasting change.</h1>
+
+      <p>
+        Your contribution supports work built around the essentials of a
+        dignified life — clean water, nourishing food, education, and vital
+        mental health support for children and families.
+      </p>
+
+      <div class="giving-note">
+        <span>♥</span>
+        <div>
+          <strong>Every contribution strengthens the mission.</strong>
+          <small>
+            Five years of work have shown what community-rooted support can
+            make possible.
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <div class="donation-card">
+
+      {% if demo_mode %}
+        <div class="demo-note">
+          <strong>Demo mode</strong>
+          <span>
+            This local site is not charging a card. A submitted donation is
+            recorded locally for testing.
+          </span>
+        </div>
+      {% endif %}
+
+      <div class="donation-card-head">
+        <span>01 / Your details</span>
+        <span>Support the mission</span>
+      </div>
+
+      <form method="POST" novalidate>
+
+        {{ form.hidden_tag() }}
+
+        <!-- Payment method is submitted with the form -->
+        <input
+          type="hidden"
+          name="payment_method"
+          id="payment_method"
+          value="paypal"
+        >
+
+        <div class="field">
+          {{ form.name.label }}
+          {{ form.name(
+            placeholder="Your full name",
+            autocomplete="name"
+          ) }}
+
+          {% for error in form.name.errors %}
+            <span class="error">{{ error }}</span>
+          {% endfor %}
+        </div>
+
+        <div class="field">
+          {{ form.email.label }}
+          {{ form.email(
+            placeholder="you@example.com",
+            autocomplete="email"
+          ) }}
+
+          {% for error in form.email.errors %}
+            <span class="error">{{ error }}</span>
+          {% endfor %}
+        </div>
+
+        <div class="field amount-field">
+          {{ form.amount.label }}
+
+          <div class="amount-input">
+            <span>$</span>
+            {{ form.amount(
+              placeholder="25.00",
+              step="0.01",
+              inputmode="decimal",
+              min="1"
+            ) }}
+          </div>
+
+          <div class="amount-presets" aria-label="Suggested amounts">
+            <button type="button" data-amount="10">$10</button>
+            <button type="button" data-amount="25">$25</button>
+            <button type="button" data-amount="50">$50</button>
+            <button type="button" data-amount="100">$100</button>
+          </div>
+
+          {% for error in form.amount.errors %}
+            <span class="error">{{ error }}</span>
+          {% endfor %}
+        </div>
+
+        <div class="field">
+          {{ form.message.label }}
+
+          {{ form.message(
+            placeholder="Leave an optional note of encouragement…",
+            rows="4"
+          ) }}
+
+          {% for error in form.message.errors %}
+            <span class="error">{{ error }}</span>
+          {% endfor %}
+        </div>
+
+        <!-- Payment methods -->
+        <div class="payment-methods">
+
+          <div class="payment-methods-heading">
+            <span class="eyebrow">Choose how to give</span>
+
+            <h2>Payment method</h2>
+
+            <p>
+              Select how you would like to complete your donation.
+            </p>
+          </div>
+
+          <div class="payment-method-grid">
+
+            <button
+              type="button"
+              class="payment-method-card selected"
+              data-payment="paypal"
+              aria-pressed="true"
+            >
+              <span class="payment-icon">P</span>
+
+              <span>
+                <strong>PayPal</strong>
+
+                <small>
+                  Pay securely with PayPal or an eligible card
+                </small>
+              </span>
+            </button>
+
+            <button
+              type="button"
+              class="payment-method-card"
+              data-payment="card"
+              aria-pressed="false"
+            >
+              <span class="payment-icon">💳</span>
+
+              <span>
+                <strong>Card Payment</strong>
+
+                <small>
+                  Pay securely with your debit or credit card
+                </small>
+              </span>
+            </button>
+
+          </div>
+
+          <p class="payment-note">
+            Your payment details are handled securely by the payment provider.
+          </p>
+
+        </div>
+
+        <button
+          type="submit"
+          class="btn-primary btn-full"
+        >
+          Continue with donation <span>→</span>
+        </button>
+
+        <p class="form-footnote">
+          You can review your information before completing the donation.
+        </p>
+
+      </form>
+
+    </div>
+  </div>
+</section>
+
+<script>
+  // Donation amount presets
+  document.querySelectorAll('[data-amount]').forEach(function (button) {
+
+    button.addEventListener('click', function () {
+
+      const input = document.getElementById('amount');
+
+      if (input) {
+        input.value = button.dataset.amount;
+      }
+
+      document.querySelectorAll('[data-amount]').forEach(function (b) {
+        b.classList.remove('selected');
+      });
+
+      button.classList.add('selected');
+    });
+
+  });
+
+
+  // Payment method selection
+  document.querySelectorAll('[data-payment]').forEach(function (button) {
+
+    button.addEventListener('click', function () {
+
+      const paymentInput =
+        document.getElementById('payment_method');
+
+      if (paymentInput) {
+        paymentInput.value = button.dataset.payment;
+      }
+
+      document.querySelectorAll('[data-payment]').forEach(function (b) {
+
+        b.classList.remove('selected');
+
+        b.setAttribute('aria-pressed', 'false');
+
+      });
+
+      button.classList.add('selected');
+
+      button.setAttribute('aria-pressed', 'true');
+
+    });
+
+  });
+</script>
+
+{% endblock %}

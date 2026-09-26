@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Login — Mokatoria Group Foundation{% endblock %}
+
+{% block content %}
+
+<section class="donate-page">
+  <div class="container">
+
+    <div class="donation-card admin-login-card">
+
+      <div class="donation-card-head">
+        <span>Admin area</span>
+        <span>Secure access</span>
+      </div>
+
+      <div class="paypal-checkout-intro">
+        <span class="eyebrow">
+          <span></span> Administrator login
+        </span>
+
+        <h1>
+          Donations
+          <em>Dashboard</em>
+        </h1>
+
+        <p>
+          Sign in to securely manage donation records and view
+          contribution activity.
+        </p>
+      </div>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="admin-messages">
+            {% for category, message in messages %}
+              <div class="admin-message {{ category }}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" class="admin-login-form">
+
+        <div class="form-field">
+          <label for="username">Username</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            autocomplete="username"
+            required
+          >
+        </div>
+
+        <div class="form-field">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            autocomplete="current-password"
+            required
+          >
+        </div>
+
+        <button type="submit" class="button button-primary">
+          Sign in to dashboard →
+        </button>
+
+      </form>
+
+      <p class="admin-login-note">
+        Authorized administrators only.
+      </p>
+
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

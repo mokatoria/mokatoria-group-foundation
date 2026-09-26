@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Give Back — uplifting children and families through clean water, nourishing food, education and mental health support.">
+  <title>{% block title %}Give Back{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="top-note">Small acts. Real impact. <span>Thank you for being part of it.</span></div>
+  <header class="site-header">
+    <div class="container nav-inner">
+      <a class="brand" href="{{ url_for('index') }}" aria-label="Give Back home">
+        <span class="brand-mark">+</span>
+        <span>Give Back</span>
+      </a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('index') }}#mission">Our mission</a>
+        <a href="{{ url_for('index') }}#impact">Our impact</a>
+        <a href="{{ url_for('projects') }}">Projects</a>
+        <a href="{{ url_for('index') }}#about">About us</a>
+        <a href="{{ url_for('contact') }}">Contact</a>
+        <a href="{{ url_for('donate') }}" class="btn-nav">Donate</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="container flash-wrap">
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <a class="brand footer-brand" href="{{ url_for('index') }}"><span class="brand-mark">+</span><span>Give Back</span></a>
+        <p>Uplifting children and families by strengthening the foundations of a dignified life: clean water, nourishing food, education and mental wellbeing.</p>
+      </div>
+      <div class="footer-links">
+        <strong>Explore</strong>
+        <a href="{{ url_for('index') }}#mission">Our mission</a>
+        <a href="{{ url_for('index') }}#impact">Our impact</a>
+        <a href="{{ url_for('projects') }}">Projects</a>
+        <a href="{{ url_for('index') }}#about">About us</a>
+        <a href="{{ url_for('donate') }}">Donate</a>
+      </div>
+      <div class="footer-links">
+        <strong>Contact</strong>
+        <span>collinsmokatoria@gmail.com.</span>
+        <span>Building hope through community empowerment.</span>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>&copy; 2026 Give Back. All rights reserved.</span>
+      <span>Built for generosity.</span>
+    </div>
+    <div class="social-links">
+    <h3>Follow us</h3>
+
+    <div class="social-links-row">
+        <a href="https://youtube.com/@collinsmokatoria1271?si=vn4obLeAcdjA9F9Y"
+           target="_blank"
+           rel="noopener noreferrer"
+           aria-label="YouTube">
+            YouTube
+        </a>
+
+        <a href="https://www.instagram.com/collins.mokalon?stkn=MTZ6cXgwemNwbTZuOQ=="
+           target="_blank"
+           rel="noopener noreferrer"
+           aria-label="Instagram">
+            Instagram
+        </a>
+
+        <a href="https://www.facebook.com/profile.php?id=100067696606371"
+           target="_blank"
+           rel="noopener noreferrer"
+           aria-label="Facebook">
+            Facebook
+        </a>
+    </div>
+</div>
+  </footer>
+</body>
+</html>

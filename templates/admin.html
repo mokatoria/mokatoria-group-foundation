@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Donations (Admin){% endblock %}
+{% block content %}
+  <section>
+    <h1>Donations</h1>
+    <table class="admin-table">
+      <thead>
+        <tr><th>ID</th><th>Name</th><th>Email</th><th>Amount</th><th>Status</th><th>Date</th></tr>
+      </thead>
+      <tbody>
+        {% for d in donations %}
+          <tr>
+            <td>{{ d.id }}</td>
+            <td>{{ d.name }}</td>
+            <td>{{ d.email }}</td>
+            <td>${{ "%.2f"|format(d.amount) }}</td>
+            <td><span class="status status-{{ d.status }}">{{ d.status }}</span></td>
+            <td>{{ d.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+{% endblock %}

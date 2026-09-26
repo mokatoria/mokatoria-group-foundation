@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Our Projects — Give Back{% endblock %}
+{% block content %}
+<section class="projects-hero">
+  <div class="container projects-hero-grid">
+    <div>
+      <span class="eyebrow"><span></span> Five years of ground work</span>
+      <h1>See the work behind the <em>hope.</em></h1>
+      <p>Our projects begin with practical needs and grow through community participation. Here is a closer look at two programs we have established and delivered over five years.</p>
+      <div class="hero-actions"><a href="{{ url_for('donate') }}" class="btn-primary">Support the work <span>→</span></a><a href="#stories" class="text-link">Explore the projects <span>↓</span></a></div>
+    </div>
+    <div class="projects-hero-photo"><div class="photo-caption"><span class="mini-label">Community impact</span><strong>34 community water stations established over five years.</strong></div></div>
+  </div>
+</section>
+
+<section id="stories" class="project-section">
+  <div class="container project-story">
+    <div class="project-story-media"><img src="{{ url_for('static', filename='images/community-team.jpeg') }}" alt="Community team gathered outdoors" loading="eager"></div>
+    <div class="project-story-copy">
+      <span class="project-kicker">01 · Living Water & Community Farming Project</span>
+      <h2>Clean water should be a foundation, not a luxury.</h2>
+      <p>We install solar-powered water filtration systems and deep-water wells in rural villages. Alongside the water systems, communities receive drought-resistant agricultural kits and support to establish sustainable communal greenhouses.</p>
+      <div class="project-results"><div class="project-result"><strong>34</strong><span>community water stations established</span></div><div class="project-result"><strong>5 years</strong><span>of continuous ground operations</span></div></div>
+      <ul class="story-list"><li>Solar-powered water filtration systems</li><li>Deep-water wells in rural villages</li><li>Drought-resistant agricultural kits</li><li>Sustainable communal greenhouses</li><li>Sustained nutrition support for thousands of families</li></ul>
+      <a href="{{ url_for('donate') }}" class="btn-secondary">Help extend the work <span>→</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="project-section alt">
+  <div class="container project-story reverse">
+    <div class="project-story-media"><img src="{{ url_for('static', filename='images/wellbeing-support.jpeg') }}" alt="Parent holding and comforting a child" loading="lazy"></div>
+    <div class="project-story-copy">
+      <span class="project-kicker">02 · Resilient Minds Youth & Family Support Program</span>
+      <h2>Creating safe spaces where healing can begin.</h2>
+      <p>We build dedicated Safe Spaces within community centers where trained local counselors provide trauma-informed therapy, group healing circles, and psychological first aid to children and families recovering from poverty or crisis.</p>
+      <div class="project-results"><div class="project-result"><strong>1,500+</strong><span>children received direct emotional support</span></div><div class="project-result"><strong>5 years</strong><span>of mental health literacy and support</span></div></div>
+      <ul class="story-list"><li>Trauma-informed therapy</li><li>Group healing circles</li><li>Psychological first aid</li><li>Mental health literacy</li><li>Stigma-reduction programs</li></ul>
+      <a href="{{ url_for('donate') }}" class="btn-secondary">Support resilient minds <span>→</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="gallery-section">
+  <div class="container">
+    <div class="section-heading"><div><span class="eyebrow"><span></span> A closer look</span><h2>People, places, and the work between the numbers.</h2></div><p>These photographs are from the community work you have shared with us, bringing the people, places and spaces behind the mission into view.</p></div>
+    <div class="gallery-grid">
+      <figure class="gallery-item tall"><img src="{{ url_for('static', filename='images/childrens-home-community.jpeg') }}" alt="Children and adults gathered outside a community children's home" loading="lazy"><figcaption>Community & care</figcaption></figure>
+      <figure class="gallery-item"><img src="{{ url_for('static', filename='images/community-greenhouse.jpeg') }}" alt="Greenhouse growing crops for sustainable community nutrition" loading="lazy"><figcaption>Sustainable nutrition</figcaption></figure>
+      <figure class="gallery-item"><img src="{{ url_for('static', filename='images/community-team.jpeg') }}" alt="Community team gathered outdoors" loading="lazy"><figcaption>Community & education</figcaption></figure>
+      <figure class="gallery-item wide"><img src="{{ url_for('static', filename='images/wellbeing-support.jpeg') }}" alt="Children and a caregiver during a community wellbeing gathering" loading="lazy"><figcaption>Family wellbeing</figcaption></figure>
+      <figure class="gallery-item"><img src="{{ url_for('static', filename='images/community-space.jpeg') }}" alt="Community play and gathering space with a drinking water sign" loading="lazy"><figcaption>Community spaces</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section class="project-cta"><div class="container project-cta-inner"><div><span class="eyebrow eyebrow-light"><span></span> The next chapter</span><h2>Help us build on five years of community-led work.</h2></div><a href="{{ url_for('donate') }}" class="btn-light">Donate now <span>→</span></a></div></section>
+{% endblock %}

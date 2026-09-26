@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Give Back — Clean Water, Nourishing Food, Education & Mental Wellbeing{% endblock %}
+{% block content %}
+<section class="hero-section hero-mission">
+  <div class="container hero-grid">
+    <div class="hero-copy">
+      <div class="eyebrow"><span></span> Five years on the ground</div>
+      <h1>Turning despair into <em>hope.</em></h1>
+      <p class="hero-lead">We uplift children and families in developing nations by helping provide the fundamental pillars of a dignified life: clean water, nourishing food, quality education, and vital mental health support.</p>
+      <div class="hero-actions">
+        <a href="{{ url_for('donate') }}" class="btn-primary">Support the mission <span>→</span></a>
+        <a href="#impact" class="text-link">See what we've accomplished <span>↓</span></a>
+      </div>
+      <div class="hero-trust">
+        <div class="trust-dot">✓</div>
+        <div><strong>Community empowerment starts from within.</strong><span>Five years of continuous ground operations, built around local communities.</span></div>
+      </div>
+    </div>
+
+    <div class="hero-art hero-photo" aria-label="Children and adults gathered outside a community children's home">
+      <div class="photo-overlay"></div>
+      <div class="hero-photo-caption">
+        <span class="mini-label">Community & care</span>
+        <strong>Real people. Real places. Five years of work on the ground.</strong>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="stats-section" aria-label="Five-year impact statistics">
+  <div class="container stats-panel stats-four">
+    <div class="stat-intro">
+      <span class="eyebrow"><span></span> Five-year impact</span>
+      <h2>Real work. Measurable progress.</h2>
+    </div>
+    <div class="stat-card"><span class="stat-number">5</span><span class="stat-label">years on the ground</span></div>
+    <div class="stat-card"><span class="stat-number">34</span><span class="stat-label">community water stations</span></div>
+    <div class="stat-card"><span class="stat-number">1,500+</span><span class="stat-label">children supported</span></div>
+    <div class="stat-card"><span class="stat-number">Thousands</span><span class="stat-label">of families reached with nutrition support</span></div>
+  </div>
+</section>
+
+<section id="mission" class="content-section mission-section">
+  <div class="container">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow"><span></span> Our mission</span>
+        <h2>The foundations of a dignified life.</h2>
+      </div>
+      <p>Our work is rooted in a simple belief: lasting change begins by strengthening the essentials that allow children and families to feel safe, healthy, capable, and hopeful.</p>
+    </div>
+    <div class="pillar-grid">
+      <article class="pillar-card"><span class="pillar-number">01</span><div class="pillar-icon">◌</div><h3>Clean water</h3><p>Reliable access to safe water through community water systems and solar-powered filtration.</p></article>
+      <article class="pillar-card"><span class="pillar-number">02</span><div class="pillar-icon">✦</div><h3>Nourishing food</h3><p>Sustainable nutrition support through agricultural kits and communal growing initiatives.</p></article>
+      <article class="pillar-card"><span class="pillar-number">03</span><div class="pillar-icon">⌁</div><h3>Quality education</h3><p>Education is a core pillar of our mission and part of our long-term vision for community empowerment.</p></article>
+      <article class="pillar-card"><span class="pillar-number">04</span><div class="pillar-icon">♡</div><h3>Mental wellbeing</h3><p>Trauma-informed support that helps children and families heal, reconnect, and build resilience.</p></article>
+    </div>
+    <div class="mission-photo-row" aria-label="Scenes representing education, community farming and family support">
+      <figure><img src="{{ url_for('static', filename='images/community-team.jpeg') }}" alt="Children gathered together outdoors" loading="lazy"><figcaption>Community & education</figcaption></figure>
+      <figure><img src="{{ url_for('static', filename='images/community-greenhouse.jpeg') }}" alt="Woman carrying produce through a community garden with greenhouses" loading="lazy"><figcaption>Sustainable nutrition</figcaption></figure>
+      <figure><img src="{{ url_for('static', filename='images/wellbeing-support.jpeg') }}" alt="Children and a caregiver during a community wellbeing gathering" loading="lazy"><figcaption>Family wellbeing</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section id="impact" class="content-section impact-section">
+  <div class="container">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow"><span></span> What we've accomplished</span>
+        <h2>Five years of work, rooted in community.</h2>
+      </div>
+      <p>These are not promises for tomorrow. They are programs established and delivered through five years of continuous work on the ground. The photographs on this page are from the community work behind the mission.</p>
+    </div>
+    <div class="impact-grid impact-grid-two">
+      <article class="impact-card impact-water">
+        <div class="impact-visual photo-water"><span class="visual-word">FARMING</span><span class="visual-symbol">✦</span></div>
+        <div class="impact-body"><span class="tag">Living Water & Community Farming Project</span><h3>Clean water, sustainable nutrition</h3><p>We install solar-powered water filtration systems and deep-water wells in rural villages, alongside drought-resistant agricultural kits and sustainable communal greenhouses.</p><div class="impact-result"><strong>34</strong><span>community water stations established over five years</span></div><p class="impact-note">The initiative has also provided sustained, life-saving nutrition to thousands of families previously experiencing acute food insecurity.</p><a href="{{ url_for('donate') }}">Support this work <span>→</span></a></div>
+      </article>
+      <article class="impact-card impact-community">
+        <div class="impact-visual photo-wellbeing"><span class="visual-word">WELLBEING</span><span class="visual-symbol">♡</span></div>
+        <div class="impact-body"><span class="tag">Resilient Minds Youth & Family Support Program</span><h3>Safe spaces for healing</h3><p>We build dedicated Safe Spaces within community centers where trained local counselors provide trauma-informed therapy, group healing circles, and psychological first aid.</p><div class="impact-result"><strong>1,500+</strong><span>children received direct emotional support</span></div><p class="impact-note">Our five years of ground operations have also included mental health literacy and stigma-reduction programs for children and families experiencing developmental trauma.</p><a href="{{ url_for('donate') }}">Support this work <span>→</span></a></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="about" class="about-section">
+  <div class="container about-grid">
+    <div class="about-badge"><span>5</span><strong>Years</strong><small>on the ground</small></div>
+    <div>
+      <span class="eyebrow"><span></span> Why this work matters</span>
+      <h2>True empowerment starts from the inside out.</h2>
+      <p>For the past five years, we have worked alongside communities to transform despair into hope. Our approach begins with the foundations of a dignified life and builds toward stronger, more resilient families and communities.</p>
+      <p>When people have access to safe water, nourishing food, education, and the support needed to heal, they have a stronger foundation from which to shape their own future.</p>
+      <a href="{{ url_for('donate') }}" class="btn-secondary">Help strengthen the mission <span>→</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="container cta-card">
+    <div><span class="eyebrow eyebrow-light"><span></span> Be part of the next chapter</span><h2>Help us keep turning essential support into lasting hope.</h2></div>
+    <a href="{{ url_for('donate') }}" class="btn-light">Donate now <span>→</span></a>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Environment secrets
+.env
+
+# SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Backups
+*_backup*
+*.bak
+
+# PyCharm
+.idea/
+
+# macOS
+.DS_Store
+
+# Test/cache files
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs
+*.log

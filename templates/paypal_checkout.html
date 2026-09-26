@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Complete Your Donation — Mokatoria Group Foundation{% endblock %}
+
+{% block content %}
+
+<section class="donate-page">
+  <div class="container">
+    <div class="donation-card paypal-checkout-card">
+
+      <div class="donation-card-head">
+        <span>02 / Complete your donation</span>
+        <span>Secure checkout</span>
+      </div>
+
+      <div class="paypal-checkout-intro">
+        <span class="eyebrow">
+          <span></span> Thank you for supporting the mission
+        </span>
+
+        <h1>Complete your <em>${{ "%.2f"|format(donation.amount) }}</em> donation.</h1>
+
+        <p>
+          You are donating to Mokatoria Group Foundation.
+          Choose PayPal or an eligible card option below to complete your contribution.
+        </p>
+      </div>
+
+      <div class="checkout-summary">
+        <div>
+          <span>Donor</span>
+          <strong>{{ donation.name }}</strong>
+        </div>
+
+        <div>
+          <span>Email</span>
+          <strong>{{ donation.email }}</strong>
+        </div>
+
+        <div>
+          <span>Donation</span>
+          <strong>${{ "%.2f"|format(donation.amount) }} USD</strong>
+        </div>
+      </div>
+
+      <div class="paypal-area">
+
+        <div id="paypal-button-container"></div>
+
+        <div id="paypal-message" class="payment-status" aria-live="polite"></div>
+
+      </div>
+
+      <a
+        href="{{ url_for('donation_cancel', donation_id=donation.id) }}"
+        class="checkout-cancel"
+      >
+        ← Cancel donation
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency=USD&components=buttons&enable-funding=card"></script>
+
+<script>
+  paypal.Buttons({
+
+    createOrder: function () {
+      return "{{ donation.paypal_order_id }}";
+    },
+
+    onApprove: function (data) {
+      const message = document.getElementById("paypal-message");
+
+      message.textContent = "Completing your donation…";
+
+      return fetch("{{ url_for('paypal_capture') }}", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          order_id: data.orderID
+        })
+      })
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (result) {
+
+        if (result.success) {
+          window.location.href =
+            "{{ url_for('thank_you', donation_id=donation.id) }}";
+          return;
+        }
+
+        throw new Error(
+          result.error || "The payment could not be completed."
+        );
+      })
+      .catch(function (error) {
+        console.error(error);
+
+        message.textContent =
+          "We couldn't complete the payment. Please try again.";
+      });
+    },
+
+    onCancel: function () {
+      window.location.href =
+        "{{ url_for('donation_cancel', donation_id=donation.id) }}";
+    },
+
+    onError: function (error) {
+      console.error(error);
+
+      const message = document.getElementById("paypal-message");
+
+      message.textContent =
+        "There was a problem loading the payment. Please try again.";
+    }
+
+  }).render("#paypal-button-container");
+</script>
+
+{% endblock %}

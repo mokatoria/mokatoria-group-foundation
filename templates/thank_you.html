@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Thank You — Give Back{% endblock %}
+
+{% block content %}
+
+<section class="section thank-you-page">
+    <div class="container">
+        <div class="thank-you-card">
+
+            <div class="thank-you-icon">
+                ✓
+            </div>
+
+            <span class="eyebrow">Thank you</span>
+
+            <h1>Your generosity makes a difference.</h1>
+
+            <p class="thank-you-message">
+                Thank you for supporting our mission to uplift children
+                and families through clean water, nourishing food,
+                quality education, and mental wellbeing.
+            </p>
+
+            <p>
+                Your contribution helps turn despair into hope and
+                supports lasting change in communities.
+            </p>
+
+            <div class="thank-you-actions">
+                <a href="{{ url_for('index') }}" class="btn btn-primary">
+                    Return Home
+                </a>
+
+                <a href="{{ url_for('projects') }}" class="btn btn-secondary">
+                    See Our Projects
+                </a>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+{% endblock %}
