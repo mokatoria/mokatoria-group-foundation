@@ -63,7 +63,7 @@
 </section>
 
 <script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency=USD&components=buttons&enable-funding=card"></script>
-
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <script>
   paypal.Buttons({
 
@@ -76,11 +76,12 @@
 
       message.textContent = "Completing your donation…";
 
-      return fetch("{{ url_for('paypal_capture') }}", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+ return fetch("{{ url_for('paypal_capture') }}", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "X-CSRFToken": document.querySelector('meta[name="csrf-token"]').content
+  },
         body: JSON.stringify({
           order_id: data.orderID
         })

@@ -3,6 +3,7 @@ import csv
 import io
 from functools import wraps
 
+
 import requests
 from flask import (
     Flask,
@@ -15,6 +16,7 @@ from flask import (
     session,
     Response,
 )
+from flask_wtf.csrf import CSRFProtect
 
 from werkzeug.security import check_password_hash
 
@@ -23,11 +25,12 @@ from extensions import db
 from models import Donation
 from forms import DonationForm
 
+csrf = CSRFProtect()
 
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
-
+    csrf.init_app(app)
     db.init_app(app)
 
     with app.app_context():

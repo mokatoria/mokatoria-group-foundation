@@ -99,6 +99,8 @@ class Config:
         ).lower()
         == "true"
     )
+    SESSION_COOKIE_NAME = "mokatoria_session"
+    PERMANENT_SESSION_LIFETIME = 3600
 
     # =========================================================
     # APPLICATION ENVIRONMENT
