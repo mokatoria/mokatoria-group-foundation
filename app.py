@@ -5,6 +5,7 @@ from functools import wraps
 
 
 import requests
+from decimal import Decimal
 from flask import (
     Flask,
     render_template,
@@ -452,6 +453,57 @@ def register_routes(app):
             )
 
             if result.get("status") == "COMPLETED":
+
+                try:
+                    capture = (
+                        result["purchase_units"][0]
+                        ["payments"]["captures"][0]
+                    )
+
+                    captured_amount = capture["amount"]["value"]
+                    captured_currency = capture["amount"]["currency_code"]
+
+                    expected_amount = Decimal(
+                        f"{donation.amount:.2f}"
+                    )
+                    actual_amount = Decimal(
+                        str(captured_amount)
+                    )
+
+                except (KeyError, IndexError, TypeError, ValueError):
+                    app.logger.exception(
+                        "PayPal capture response was missing expected payment details."
+                    )
+
+                    return jsonify({
+                        "success": False,
+                        "error": "PayPal returned an invalid payment response.",
+                    }), 400
+
+                if captured_currency != "USD":
+                    app.logger.error(
+                        "PayPal currency mismatch for donation %s: expected USD, got %s",
+                        donation.id,
+                        captured_currency,
+                    )
+
+                    return jsonify({
+                        "success": False,
+                        "error": "Payment currency could not be verified.",
+                    }), 400
+
+                if actual_amount != expected_amount:
+                    app.logger.error(
+                        "PayPal amount mismatch for donation %s: expected %s, got %s",
+                        donation.id,
+                        expected_amount,
+                        actual_amount,
+                    )
+
+                    return jsonify({
+                        "success": False,
+                        "error": "Payment amount could not be verified.",
+                    }), 400
 
                 donation.status = "completed"
 
