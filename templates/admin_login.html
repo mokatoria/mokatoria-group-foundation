@@ -43,7 +43,7 @@
       {% endwith %}
 
       <form method="POST" class="admin-login-form">
-{{ csrf_token() }}
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="form-field">
           <label for="username">Username</label>
           <input
