@@ -130,7 +130,7 @@ button, input, textarea { font: inherit; }
 
 /* Curated photography */
 .hero-photo {
-  background-image: url("../images/childrens-home-community.jpeg");
+  background-image: url("../images/community-hope.jpg");
   background-size: cover;
   background-position: center;
   min-height: 560px;
