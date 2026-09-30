@@ -62,6 +62,12 @@ button, input, textarea { font: inherit; }
 .hero-trust span { color: var(--muted); font-size: .78rem; }
 
 .hero-art { min-height: 520px; position: relative; border-radius: 38px; overflow: hidden; background: linear-gradient(145deg, #dfece4, #b8d2c2); box-shadow: var(--shadow); }
+
+.hero-photo {
+  background-image: url("../images/community-hope.jpg");
+  background-size: cover;
+  background-position: center;
+}
 .sun { position: absolute; width: 250px; height: 250px; border-radius: 50%; background: #f3dba6; right: 8%; top: 7%; opacity: .8; }
 .orb { position: absolute; border-radius: 50%; background: rgba(255,255,255,.25); }
 .orb-one { width: 90px; height: 90px; left: 12%; top: 18%; }.orb-two { width: 45px; height: 45px; right: 22%; bottom: 28%; }
