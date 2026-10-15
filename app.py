@@ -112,6 +112,11 @@ def admin_required(view):
 
 def register_routes(app):
 
+    @app.route("/favicon.ico")
+    def favicon():
+        return app.send_static_file("favicon.ico")
+
+
     @app.context_processor
     def search_metadata():
         public_pages = {"index", "projects", "donate", "contact"}

@@ -2,6 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <link rel="icon" type="image/png" sizes="96x96" href="{{ url_for('static', filename='favicon.png') }}">
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
   <meta name="msvalidate.01" content="F123EC55DF694E8331790F0E8548FD29">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="{{ page_description }}">
@@ -17,6 +21,7 @@
     "@context": "https://schema.org", "@type": "Organization",
     "name": "Mokatoria Community Foundation",
     "url": "https://mokatoriagroupfoundation.com/",
+    "logo": "https://mokatoriagroupfoundation.com/static/favicon.png",
     "email": "mokatoriafoundation@gmail.com", "telephone": "+254743563077",
     "address": {"@type": "PostalAddress", "streetAddress": "Tom Mboya Street", "addressLocality": "Nairobi", "addressCountry": "KE"}
   }|tojson }}</script>
