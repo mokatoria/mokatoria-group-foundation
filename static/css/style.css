@@ -409,3 +409,14 @@ button, input, textarea { font: inherit; }
 @media (min-width: 901px) { .main-nav { gap: 16px; font-size: .85rem; } .nav-inner { gap: 20px; } }
 @media (max-width: 900px) { .foundation-contact-grid { grid-template-columns: 1fr; } }
 @media (max-width: 480px) { .site-header .brand { max-width: 210px; font-size: .85rem; } .foundation-contact { padding: 48px 0 60px; } .contact-detail-card, .donation-contact-note { padding: 22px; } }
+
+/* Illustrated mission cards: consistent full-width images, with copy below. */
+.pillar-grid-illustrated { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px; }
+.pillar-card-illustrated { padding: 0; overflow: hidden; min-height: 0; background: var(--paper); }
+.pillar-card-illustrated .pillar-image { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: contain; background: var(--cream); }
+.pillar-body { padding: 24px 26px 28px; }
+.pillar-kicker { display: block; color: var(--green-700); text-transform: uppercase; letter-spacing: .1em; font-size: .65rem; font-weight: 700; margin-bottom: 12px; }
+.pillar-card-illustrated h3 { font-size: 1.35rem; }
+.pillar-card-illustrated p { font-size: .92rem; line-height: 1.8; }
+.pillar-illustration-note { margin: 16px 0 28px; color: var(--muted); font-size: .75rem; }
+@media (max-width: 650px) { .pillar-grid-illustrated { grid-template-columns: 1fr; gap: 20px; } .pillar-body { padding: 22px; } }

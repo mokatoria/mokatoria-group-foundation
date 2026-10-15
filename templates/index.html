@@ -49,12 +49,25 @@
       </div>
       <p>Our work is rooted in a simple belief: lasting change begins by strengthening the essentials that allow children and families to feel safe, healthy, capable, and hopeful.</p>
     </div>
-    <div class="pillar-grid">
-      <article class="pillar-card"><span class="pillar-number">01</span><div class="pillar-icon">◌</div><h3>Clean water</h3><p>Reliable access to safe water through community water systems and solar-powered filtration.</p></article>
-      <article class="pillar-card"><span class="pillar-number">02</span><div class="pillar-icon">✦</div><h3>Nourishing food</h3><p>Sustainable nutrition support through agricultural kits and communal growing initiatives.</p></article>
-      <article class="pillar-card"><span class="pillar-number">03</span><div class="pillar-icon">⌁</div><h3>Quality education</h3><p>Education is a core pillar of our mission and part of our long-term vision for community empowerment.</p></article>
-      <article class="pillar-card"><span class="pillar-number">04</span><div class="pillar-icon">♡</div><h3>Mental wellbeing</h3><p>Trauma-informed support that helps children and families heal, reconnect, and build resilience.</p></article>
+    <div class="pillar-grid pillar-grid-illustrated">
+      <article class="pillar-card pillar-card-illustrated">
+        <img class="pillar-image" src="{{ url_for('static', filename='images/mission-water.jpg') }}" alt="Illustration of women collecting water from a community tap." width="1000" height="667" loading="lazy">
+        <div class="pillar-body"><span class="pillar-kicker">01 / Our mission</span><h3>Clean water</h3><p>Reliable access to safe water through community water systems and solar-powered filtration.</p></div>
+      </article>
+      <article class="pillar-card pillar-card-illustrated">
+        <img class="pillar-image" src="{{ url_for('static', filename='images/mission-food.jpg') }}" alt="Illustration of community gardeners harvesting leafy vegetables." width="1000" height="667" loading="lazy">
+        <div class="pillar-body"><span class="pillar-kicker">02 / Our mission</span><h3>Nourishing food</h3><p>Sustainable nutrition support through agricultural kits and communal growing initiatives.</p></div>
+      </article>
+      <article class="pillar-card pillar-card-illustrated">
+        <img class="pillar-image" src="{{ url_for('static', filename='images/mission-education.jpg') }}" alt="Illustration of a teacher reading with two children." width="1000" height="667" loading="lazy">
+        <div class="pillar-body"><span class="pillar-kicker">03 / Our mission</span><h3>Quality education</h3><p>Education is a core pillar of our mission and part of our long-term vision for community empowerment.</p></div>
+      </article>
+      <article class="pillar-card pillar-card-illustrated">
+        <img class="pillar-image" src="{{ url_for('static', filename='images/mission-wellbeing.jpg') }}" alt="Illustration of two adults having a supportive conversation in a garden." width="1000" height="667" loading="lazy">
+        <div class="pillar-body"><span class="pillar-kicker">04 / Our mission</span><h3>Mental wellbeing</h3><p>Trauma-informed support that helps children and families heal, reconnect, and build resilience.</p></div>
+      </article>
     </div>
+    <p class="pillar-illustration-note">AI-created illustrations representing our areas of focus.</p>
     <div class="mission-photo-row" aria-label="Scenes representing education, community farming and family support">
       <figure><img src="{{ url_for('static', filename='images/community-team.jpeg') }}" alt="Children gathered together outdoors" loading="lazy"><figcaption>Community & education</figcaption></figure>
       <figure><img src="{{ url_for('static', filename='images/community-greenhouse.jpeg') }}" alt="Woman carrying produce through a community garden with greenhouses" loading="lazy"><figcaption>Sustainable nutrition</figcaption></figure>
