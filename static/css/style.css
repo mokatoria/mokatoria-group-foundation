@@ -422,3 +422,27 @@ button, input, textarea { font: inherit; }
 @media (max-width: 650px) { .pillar-grid-illustrated { grid-template-columns: 1fr; gap: 20px; } .pillar-body { padding: 22px; } }
 
 .neema-option { margin-top: 16px; }
+
+/* Private donation management */
+.admin-page { padding-top: 48px; padding-bottom: 70px; }
+.admin-heading { max-width: 800px; margin: 20px 0 28px; }
+.admin-heading h1, .payment-receipt h1 { font-family: 'Playfair Display', Georgia, serif; font-size: clamp(2rem,4vw,3rem); color: var(--green-950); margin: 10px 0; }
+.admin-heading p, .admin-page > p { color: var(--muted); }
+.admin-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-bottom: 26px; }
+.admin-actions form { margin: 0; }
+.admin-totals { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 18px; }
+.admin-totals > div { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 20px 28px; }
+.admin-totals span, .admin-totals strong { display: block; }.admin-totals strong { font-size: 1.6rem; color: var(--green-900); }
+.admin-table-wrap { overflow-x: auto; background: var(--paper); border: 1px solid var(--line); border-radius: 16px; }
+.admin-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+.admin-table th, .admin-table td { text-align: left; padding: 16px; border-bottom: 1px solid var(--line); vertical-align: top; overflow-wrap: anywhere; min-width: 95px; }
+.admin-table th { background: var(--green-100); }
+.admin-record-form { max-width: 850px; background: var(--paper); padding: 30px; border: 1px solid var(--line); border-radius: 22px; }
+.admin-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }
+.admin-record-form select { width: 100%; padding: 13px; border: 1px solid #ccd6cf; border-radius: 12px; background: white; font: inherit; }
+.confirmation-check { display: flex; align-items: flex-start; gap: 12px; margin: 10px 0 24px; }
+.confirmation-check input { margin-top: 7px; flex-shrink: 0; }
+.payment-receipt { max-width: 800px; background: white; border: 1px solid var(--line); padding: 40px; border-radius: 20px; }
+.receipt-number { color: var(--muted); }.receipt-amount { font-size: 2.5rem; font-weight: 700; color: var(--green-700); margin: 24px 0 4px; }
+@media(max-width:650px) { .admin-form-grid { grid-template-columns: 1fr; }.admin-record-form, .payment-receipt { padding: 22px; } }
+@media print { .site-header, .top-note, .site-footer, .receipt-tools, .flash-wrap { display: none !important; }.admin-page { width: 100%; padding: 0; }.payment-receipt { border: 0; padding: 12mm; max-width: none; } body { background: white; } .payment-receipt { break-inside: avoid; } }

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Receipt MCF-{{ '%06d'|format(donation.id) }} — Admin{% endblock %}
+{% block content %}
+<section class="admin-page container"><div class="admin-actions receipt-tools"><a href="{{ url_for('admin_donations') }}">← Donation records</a><button class="btn-primary" type="button" onclick="window.print()">Print / Save as PDF</button></div>
+<article class="payment-receipt">
+<span class="eyebrow">Mokatoria Community Foundation</span><h1>Donation receipt</h1><p class="receipt-number">MCF-{{ '%06d'|format(donation.id) }}</p>
+<p>Thank you, <strong>{{ donation.name }}</strong>, for supporting our community work.</p>
+<div class="receipt-amount">{{ donation.currency }} {{ '%.2f'|format(donation.amount) }}</div>
+<p>Amount confirmed received after any payment-provider or transfer fees.</p>
+<dl class="bank-details"><dt>Received on</dt><dd>{{ donation.received_on }}</dd><dt>Receiving account</dt><dd>{{ donation.payment_method|title }} · Collins Mokaya Onyancha</dd><dt>Transaction reference</dt><dd>{{ donation.payment_reference }}</dd><dt>Recorded on (UTC)</dt><dd>{{ donation.confirmed_at.strftime('%Y-%m-%d %H:%M') }}</dd></dl>
+<p>This receipt acknowledges a contribution manually confirmed in the receiving account. It is not a bank statement or a certificate of tax deductibility.</p>
+<p>mokatoriafoundation@gmail.com<br>+254 743 563 077<br>Tom Mboya Street, Nairobi, Kenya</p>
+</article></section>
+{% endblock %}

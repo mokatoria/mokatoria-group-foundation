@@ -29,7 +29,9 @@ from werkzeug.security import check_password_hash
 from config import Config
 from extensions import db
 from models import Donation
-from forms import DonationForm
+from forms import DonationForm, RecordPaymentForm
+from datetime import datetime, timezone
+from sqlalchemy.exc import IntegrityError
 
 csrf = CSRFProtect()
 
@@ -146,6 +148,7 @@ def register_routes(app):
     def private_page_search_headers(response):
         if request.path.startswith(("/admin", "/thank-you", "/paystack", "/donation")):
             response.headers["X-Robots-Tag"] = "noindex, nofollow"
+            response.headers["Cache-Control"] = "no-store"
         return response
 
     # ---------------------------------------------------------
@@ -186,6 +189,7 @@ def register_routes(app):
             if valid_username and valid_password:
                 session.clear()
                 session["admin_logged_in"] = True
+                session["admin_username"] = username
 
                 return redirect(
                     url_for("admin_donations")
@@ -371,6 +375,43 @@ def register_routes(app):
     # ADMIN DONATION DASHBOARD
     # ---------------------------------------------------------
 
+    @app.route("/admin/donations/new", methods=["GET", "POST"])
+    @admin_required
+    def record_payment():
+        form = RecordPaymentForm()
+        if request.method == "GET":
+            form.received_on.data = datetime.now(timezone.utc).date()
+        if form.validate_on_submit():
+            donation = Donation(
+                name=form.name.data.strip(), email=(form.email.data or "").strip(),
+                amount=float(form.amount.data), currency=form.currency.data,
+                payment_mode="manual", status="completed",
+                payment_method=form.payment_method.data,
+                payment_reference=form.payment_reference.data.strip().upper(),
+                received_on=form.received_on.data,
+                confirmed_at=datetime.now(timezone.utc).replace(tzinfo=None),
+                confirmed_by=session.get("admin_username", app.config["ADMIN_USERNAME"]),
+                message=(form.message.data or "").strip(),
+            )
+            db.session.add(donation)
+            try:
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+                form.payment_reference.errors.append("This reference is already recorded for that receiving account. Check the existing record before trying again.")
+            else:
+                flash("Confirmed payment recorded. You can print or save its receipt.", "info")
+                return redirect(url_for("payment_receipt", donation_id=donation.id), code=303)
+        return render_template("record_payment.html", form=form)
+
+    @app.route("/admin/donations/<int:donation_id>/receipt")
+    @admin_required
+    def payment_receipt(donation_id):
+        donation = db.get_or_404(Donation, donation_id)
+        if donation.payment_mode != "manual" or donation.status != "completed":
+            abort(404)
+        return render_template("payment_receipt.html", donation=donation)
+
     @app.route("/admin/donations")
     @admin_required
     def admin_donations():
@@ -379,48 +420,15 @@ def register_routes(app):
             Donation.created_at.desc()
         ).all()
 
-        completed_donations = [
-            donation
-            for donation in donations
-            if donation.status == "completed" and donation.currency == "KES" and donation.payment_mode == "live"
-        ]
-
-        completed_total = sum(
-            donation.amount
-            for donation in completed_donations
-        )
-
-        completed_count = len(
-            completed_donations
-        )
-
-        average_donation = (
-            completed_total / completed_count
-            if completed_count
-            else 0
-        )
-
-        pending_count = sum(
-            1
-            for donation in donations
-            if donation.status == "pending"
-        )
-
-        cancelled_count = sum(
-            1
-            for donation in donations
-            if donation.status == "cancelled"
-        )
-
-        return render_template(
-            "admin.html",
-            donations=donations,
-            completed_total=completed_total,
-            completed_count=completed_count,
-            average_donation=average_donation,
-            pending_count=pending_count,
-            cancelled_count=cancelled_count,
-        )
+        totals = {}
+        confirmed_count = 0
+        for donation in donations:
+            if donation.status == "completed" and donation.payment_mode in {"manual", "live", "legacy"}:
+                totals[donation.currency] = totals.get(donation.currency, Decimal("0")) + Decimal(str(donation.amount))
+                confirmed_count += 1
+        return render_template("admin.html", donations=donations, totals=sorted(totals.items()),
+                               confirmed_count=confirmed_count,
+                               pending_count=sum(d.status == "pending" for d in donations))
 
 
     # ---------------------------------------------------------
@@ -452,23 +460,32 @@ def register_routes(app):
             "Message",
             "Paystack Reference",
             "Date",
+            "Receiving account", "Payment reference", "Received on", "Confirmed at", "Confirmed by",
         ])
+
+        def csv_text(value):
+            value = str(value or "")
+            return "'" + value if value.lstrip().startswith(("=", "+", "-", "@")) else value
 
         for donation in donations:
 
             writer.writerow([
                 donation.id,
-                donation.name,
-                donation.email,
+                csv_text(donation.name),
+                csv_text(donation.email),
                 f"{donation.amount:.2f}",
                 donation.currency,
                 donation.payment_mode,
                 donation.status,
-                donation.message or "",
+                csv_text(donation.message),
                 donation.paystack_reference or "",
                 donation.created_at.strftime(
                     "%Y-%m-%d %H:%M:%S"
                 ),
+                donation.payment_method or "", csv_text(donation.payment_reference),
+                donation.received_on.isoformat() if donation.received_on else "",
+                donation.confirmed_at.isoformat() if donation.confirmed_at else "",
+                csv_text(donation.confirmed_by),
             ])
 
         csv_data = output.getvalue()

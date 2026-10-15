@@ -78,3 +78,77 @@ def test_legacy_donation_schema_upgrade_preserves_history():
         assert row['amount'] == 25.5 and row['status'] == 'completed'
         assert row['paypal_order_id'] == 'old-paypal-order'
         assert row['currency'] == 'USD' and row['payment_mode'] == 'legacy'
+
+
+def admin_form(client):
+    with client.session_transaction() as session:
+        session['admin_logged_in'] = True
+        session['admin_username'] = 'test-admin'
+    response = client.get('/admin/donations/new')
+    assert response.status_code == 200
+    return re.search(r'name="csrf_token"[^>]*value="([^"]+)"', response.get_data(as_text=True)).group(1)
+
+
+def payment_data(client, **changes):
+    from datetime import datetime, timezone
+    data = dict(csrf_token=admin_form(client), name='Test Donor', email='donor@example.com',
+                amount='12.34', currency='USD', payment_method='paypal',
+                payment_reference='txn-123', received_on=datetime.now(timezone.utc).date().isoformat(),
+                confirmed='y', message='Private internal note')
+    data.update(changes)
+    return data
+
+
+def test_manual_payment_requires_admin_and_csrf(client, app):
+    assert client.get('/admin/donations/new').status_code == 302
+    assert client.get('/admin/donations/1/receipt').status_code == 302
+    assert client.post('/admin/donations/new', data={}).status_code == 400
+    admin_form(client)
+    assert client.post('/admin/donations/new', data={'name': 'Fake'}).status_code == 400
+    with app.app_context():
+        assert Donation.query.count() == 0
+
+
+def test_record_payment_duplicate_receipt_totals_and_privacy(client, app):
+    data = payment_data(client)
+    response = client.post('/admin/donations/new', data=data)
+    assert response.status_code == 303
+    receipt_url = response.headers['Location']
+    receipt = client.get(receipt_url)
+    assert receipt.status_code == 200 and b'USD 12.34' in receipt.data
+    assert b'Private internal note' not in receipt.data
+    assert receipt.headers['Cache-Control'] == 'no-store'
+    with app.app_context():
+        donation = Donation.query.one()
+        assert donation.status == 'completed' and donation.payment_mode == 'manual'
+        assert donation.payment_reference == 'TXN-123'
+        assert donation.confirmed_by == 'test-admin' and donation.confirmed_at
+    data['payment_reference'] = ' TxN-123 '
+    duplicate = client.post('/admin/donations/new', data=data)
+    assert duplicate.status_code == 200 and b'already recorded' in duplicate.data
+    client.post('/admin/donations/new', data=payment_data(client, currency='KES', amount='500', payment_method='equity'))
+    dashboard = client.get('/admin/donations')
+    assert b'USD received' in dashboard.data and b'KES received' in dashboard.data
+    assert b'12.34' in dashboard.data and b'500.00' in dashboard.data
+    csv = client.get('/admin/donations/export')
+    assert b'Payment reference' in csv.data and b'TXN-123' in csv.data
+    with client.session_transaction() as session:
+        session.clear()
+    assert client.get(receipt_url).status_code == 302
+    for path in ['/', '/donate']:
+        html = client.get(path).data
+        assert b'Test Donor' not in html and b'txn-123' not in html
+        assert b'Record received payment' not in html
+
+
+@pytest.mark.parametrize('changes', [
+    {'amount': '-1'}, {'amount': 'NaN'}, {'amount': '1.234'},
+    {'confirmed': ''}, {'payment_reference': '   '}, {'name': '   '},
+    {'currency': 'XXX'}, {'payment_method': 'unknown'}, {'received_on': '2999-01-01'},
+    {'currency': 'JPY', 'amount': '1.23'},
+])
+def test_invalid_manual_records_are_not_saved(client, app, changes):
+    response = client.post('/admin/donations/new', data=payment_data(client, **changes))
+    assert response.status_code == 200
+    with app.app_context():
+        assert Donation.query.count() == 0

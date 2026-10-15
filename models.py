@@ -24,6 +24,13 @@ class Donation(db.Model):
     payment_mode = db.Column(db.String(20), nullable=False)
     paystack_reference = db.Column(db.String(100), nullable=True, unique=True)
 
+    payment_method = db.Column(db.String(20), nullable=True)
+    payment_reference = db.Column(db.String(120), nullable=True)
+    received_on = db.Column(db.Date, nullable=True)
+    confirmed_at = db.Column(db.DateTime, nullable=True)
+    confirmed_by = db.Column(db.String(120), nullable=True)
+    __table_args__ = (db.Index('uq_donation_manual_reference', 'payment_method', 'payment_reference', unique=True),)
+
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
     def __repr__(self):

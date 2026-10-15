@@ -1,24 +1,13 @@
 {% extends "base.html" %}
-{% block title %}Donations (Admin){% endblock %}
+{% block title %}Donation dashboard — Admin{% endblock %}
 {% block content %}
-  <section>
-    <h1>Donations</h1><p>Completed live KES: {{completed_total}} KES · Count: {{completed_count}} · Average: {{average_donation}} KES</p><p>Pending: {{pending_count}} · Cancelled: {{cancelled_count}}</p><a href="{{url_for('export_donations')}}">Export CSV</a><form method="post" action="{{url_for('admin_logout')}}"><input type="hidden" name="csrf_token" value="{{csrf_token()}}"><button>Sign out</button></form>
-    <table class="admin-table">
-      <thead>
-        <tr><th>ID</th><th>Name</th><th>Email</th><th>Amount</th><th>Mode</th><th>Reference</th><th>Status</th><th>Date</th></tr>
-      </thead>
-      <tbody>
-        {% for d in donations %}
-          <tr>
-            <td>{{ d.id }}</td>
-            <td>{{ d.name }}</td>
-            <td>{{ d.email }}</td>
-            <td>{{d.currency}} {{ "%.2f"|format(d.amount) }}</td>
-            <td>{{d.payment_mode}}</td><td>{{d.paystack_reference or ''}}</td><td>{% if d.payment_mode in ['test','live'] and d.status != 'completed' %}<form method="post" action="{{url_for('admin_verify',donation_id=d.id)}}"><input type="hidden" name="csrf_token" value="{{csrf_token()}}"><button>Verify payment</button></form>{% endif %}<span class="status status-{{ d.status }}">{{ d.status }}</span></td>
-            <td>{{ d.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </section>
+<section class="admin-page container">
+<div class="admin-heading"><span class="eyebrow">Admin only</span><h1>Donation records</h1><p>{{ confirmed_count }} confirmed records · {{ pending_count }} pending. Test and demo payments are excluded from totals. Historical records are labelled legacy.</p></div>
+<div class="admin-actions"><a class="btn-primary" href="{{ url_for('record_payment') }}">Record received payment +</a><a class="btn-secondary" href="{{ url_for('export_donations') }}">Export CSV</a><form method="post" action="{{url_for('admin_logout')}}"><input type="hidden" name="csrf_token" value="{{csrf_token()}}"><button class="btn-secondary">Sign out</button></form></div>
+<div class="admin-totals">{% for currency,total in totals %}<div><span>{{ currency }} received</span><strong>{{ '%.2f'|format(total) }}</strong></div>{% else %}<p>No confirmed payments recorded yet.</p>{% endfor %}</div>
+<p>Totals are kept separately by currency; no exchange-rate conversion is applied. Manual records reflect amounts received after fees.</p>
+<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Record</th><th>Donor</th><th>Amount</th><th>Account / mode</th><th>Reference</th><th>Status</th><th>Received</th><th>Receipt</th></tr></thead><tbody>
+{% for d in donations %}<tr><td>#{{ d.id }}</td><td>{{ d.name }}{% if d.email %}<br><small>{{ d.email }}</small>{% endif %}</td><td>{{ d.currency }} {{ '%.2f'|format(d.amount) }}</td><td>{{ (d.payment_method or d.payment_mode)|title }}</td><td>{{ d.payment_reference or d.paystack_reference or '—' }}</td><td>{{ d.status }}{% if d.payment_mode in ['test','live'] and d.status != 'completed' %}<form method="post" action="{{url_for('admin_verify',donation_id=d.id)}}"><input type="hidden" name="csrf_token" value="{{csrf_token()}}"><button>Verify payment</button></form>{% endif %}</td><td>{{ d.received_on or d.created_at.strftime('%Y-%m-%d') }}</td><td>{% if d.payment_mode == 'manual' and d.status == 'completed' %}<a href="{{ url_for('payment_receipt',donation_id=d.id) }}">View receipt</a>{% else %}—{% endif %}</td></tr>
+{% else %}<tr><td colspan="8">No donation records yet.</td></tr>{% endfor %}
+</tbody></table></div></section>
 {% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Record payment — Admin{% endblock %}
+{% block content %}
+<section class="admin-page container"><a href="{{ url_for('admin_donations') }}">← Donation dashboard</a>
+<div class="admin-heading"><span class="eyebrow">Admin only</span><h1>Record a received payment</h1><p>Check the actual PayPal, Equity, or Neema account first. Enter the amount and currency credited to that account, after any fees. A donor screenshot alone is not confirmation.</p></div>
+<form method="post" class="admin-record-form" novalidate>{{ form.hidden_tag() }}
+<div class="admin-form-grid">
+{% for field in [form.name, form.email, form.payment_method, form.payment_reference, form.amount, form.currency, form.received_on, form.message] %}
+<div class="field">{{ field.label }}{{ field() }}{% for error in field.errors %}<span class="error">{{ error }}</span>{% endfor %}</div>
+{% endfor %}
+</div>
+<div class="confirmation-check">{{ form.confirmed() }} {{ form.confirmed.label }}</div>
+{% for error in form.confirmed.errors %}<p class="error">{{ error }}</p>{% endfor %}
+{{ form.submit(class_="btn-primary") }}
+<p class="form-footnote">Saving records the payment as completed. It does not move money or send an email.</p>
+</form></section>
+{% endblock %}
