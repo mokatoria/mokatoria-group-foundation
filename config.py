@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 
 # Load environment variables from .env
-load_dotenv()
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
 
 class Config:
@@ -37,33 +37,19 @@ class Config:
         ),
     )
 
+    # Render PostgreSQL URLs use the installed psycopg 3 driver.
+    if SQLALCHEMY_DATABASE_URI.startswith(("postgres://", "postgresql://")):
+        SQLALCHEMY_DATABASE_URI = "postgresql+psycopg://" + SQLALCHEMY_DATABASE_URI.split("://", 1)[1]
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # =========================================================
-    # PAYPAL
-    # =========================================================
-
-    PAYPAL_CLIENT_ID = os.environ.get(
-        "PAYPAL_CLIENT_ID",
-        "",
-    )
-
-    PAYPAL_CLIENT_SECRET = os.environ.get(
-        "PAYPAL_CLIENT_SECRET",
-        "",
-    )
-
-    PAYPAL_ENV = os.environ.get(
-        "PAYPAL_ENV",
-        "sandbox",
-    ).lower()
-
-    # The application is in demo mode only when PayPal
-    # credentials have not been configured.
-    DEMO_MODE = not bool(
-        PAYPAL_CLIENT_ID
-        and PAYPAL_CLIENT_SECRET
-    )
+    # PAYSTACK
+    PAYSTACK_SECRET_KEY = os.getenv("PAYSTACK_SECRET_KEY", "")
+    PAYSTACK_MODE = os.getenv("PAYSTACK_MODE", "test").lower()
+    DEMO_MODE = os.getenv("DEMO_MODE", "false").lower() == "true"
+    PUBLIC_BASE_URL = os.getenv("PUBLIC_BASE_URL", "http://127.0.0.1:5000")
+    MAX_CONTENT_LENGTH = 65536
 
     # =========================================================
     # ADMIN ACCOUNT
@@ -117,23 +103,8 @@ class Config:
 
     if ENVIRONMENT == "production":
 
-        if not PAYPAL_CLIENT_ID:
-            raise RuntimeError(
-                "PAYPAL_CLIENT_ID must be configured "
-                "in production."
-            )
-
-        if not PAYPAL_CLIENT_SECRET:
-            raise RuntimeError(
-                "PAYPAL_CLIENT_SECRET must be configured "
-                "in production."
-            )
-
-        if PAYPAL_ENV != "live":
-            raise RuntimeError(
-                "PAYPAL_ENV must be set to 'live' "
-                "in production."
-            )
+        if DEMO_MODE:
+            raise RuntimeError("Demo mode must be disabled in production.")
 
         if not ADMIN_PASSWORD_HASH:
             raise RuntimeError(

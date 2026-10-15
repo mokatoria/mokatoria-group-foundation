@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Give Back — Clean Water, Nourishing Food, Education & Mental Wellbeing{% endblock %}
+{% block title %}Mokatoria Community Foundation — Clean Water, Nourishing Food, Education & Mental Wellbeing{% endblock %}
 {% block content %}
 <section class="hero-section hero-mission">
   <div class="container hero-grid">
@@ -17,8 +17,8 @@
       </div>
     </div>
 
-    <div class="hero-art hero-photo" style="background-image: url('{{ url_for('static', filename='images/community-hope.jpg') }}');" aria-label="Children and adults gathered outside a community children's home">
-      <div class="photo-overlay"></div>
+    <div class="hero-art hero-photo hero-photo-full">
+      <img class="hero-main-image" src="{{ url_for('static', filename='images/community-hope.jpg') }}" alt="Adults and children sharing books and learning materials at a community gathering" fetchpriority="high">
       <div class="hero-photo-caption">
         <span class="mini-label">Community & care</span>
         <strong>Real people. Real places. Five years of work on the ground.</strong>

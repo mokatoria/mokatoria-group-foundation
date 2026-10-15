@@ -1,4 +1,9 @@
-import base64
+import secrets
+import hashlib
+import hmac
+import json
+from urllib.parse import urlparse
+from schema_upgrade import upgrade_payment_schema
 import csv
 import io
 from functools import wraps
@@ -13,7 +18,7 @@ from flask import (
     url_for,
     request,
     flash,
-    jsonify,
+    abort,
     session,
     Response,
 )
@@ -31,114 +36,64 @@ csrf = CSRFProtect()
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
+    if app.config["PAYSTACK_MODE"] not in {"test", "live"}:
+        raise RuntimeError("PAYSTACK_MODE must be test or live.")
+    if app.config["DEMO_MODE"] and app.config["PAYSTACK_MODE"] == "live":
+        raise RuntimeError("Demo mode cannot be used with live mode.")
     csrf.init_app(app)
     db.init_app(app)
 
     with app.app_context():
         db.create_all()
+        upgrade_payment_schema(db.engine)
 
     register_routes(app)
 
     return app
 
 
-def get_paypal_base_url(app):
-    """Return the correct PayPal API URL for the current environment."""
-    if app.config["PAYPAL_ENV"].lower() == "live":
-        return "https://api-m.paypal.com"
-
-    return "https://api-m.sandbox.paypal.com"
-
-
-def get_paypal_access_token(app):
-    """
-    Get a PayPal OAuth access token using the Client ID and Secret.
-    """
-    client_id = app.config["PAYPAL_CLIENT_ID"]
-    client_secret = app.config["PAYPAL_CLIENT_SECRET"]
-
-    if not client_id or not client_secret:
-        raise RuntimeError("PayPal credentials are not configured.")
-
-    credentials = f"{client_id}:{client_secret}"
-
-    encoded_credentials = base64.b64encode(
-        credentials.encode("utf-8")
-    ).decode("utf-8")
-
-    response = requests.post(
-        f"{get_paypal_base_url(app)}/v1/oauth2/token",
-        headers={
-            "Accept": "application/json",
-            "Accept-Language": "en_US",
-            "Authorization": f"Basic {encoded_credentials}",
-        },
-        data={
-            "grant_type": "client_credentials",
-        },
-        timeout=30,
+def paystack_request(app, method, path, payload=None):
+    key = app.config["PAYSTACK_SECRET_KEY"]
+    mode = app.config["PAYSTACK_MODE"]
+    if mode not in {"test", "live"} or not key.startswith(f"sk_{mode}_"):
+        raise RuntimeError("Paystack key must match PAYSTACK_MODE.")
+    response = requests.request(
+        method, "https://api.paystack.co" + path,
+        headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+        json=payload, timeout=(5, 15),
     )
-
     response.raise_for_status()
-
-    return response.json()["access_token"]
-
-
-def create_paypal_order(app, donation):
-    """
-    Create a PayPal order for the donation.
-    """
-    access_token = get_paypal_access_token(app)
-
-    payload = {
-        "intent": "CAPTURE",
-        "purchase_units": [
-            {
-                "reference_id": str(donation.id),
-                "description": "Donation to Mokatoria Group Foundation",
-                "custom_id": str(donation.id),
-                "amount": {
-                    "currency_code": "USD",
-                    "value": f"{donation.amount:.2f}",
-                },
-            }
-        ],
-    }
-
-    response = requests.post(
-        f"{get_paypal_base_url(app)}/v2/checkout/orders",
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {access_token}",
-        },
-        json=payload,
-        timeout=30,
-    )
-
-    response.raise_for_status()
-
-    return response.json()
+    body = response.json()
+    if not isinstance(body, dict) or body.get("status") is not True or not isinstance(body.get("data"), dict):
+        raise ValueError("Invalid Paystack response")
+    return body["data"]
 
 
-def capture_paypal_order(app, order_id):
-    """
-    Capture an approved PayPal order.
-    """
-    access_token = get_paypal_access_token(app)
+def minor_units(amount):
+    value = Decimal(str(amount))
+    if not value.is_finite() or value <= 0 or value != value.quantize(Decimal("0.01")):
+        raise ValueError("Invalid donation amount")
+    return int(value * 100)
 
-    response = requests.post(
-        f"{get_paypal_base_url(app)}/v2/checkout/orders/{order_id}/capture",
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {access_token}",
-        },
-        json={},
-        timeout=30,
-    )
 
-    response.raise_for_status()
-
-    return response.json()
+def verify_donation(app, donation):
+    if donation.payment_mode not in {"test", "live"} or donation.payment_mode != app.config["PAYSTACK_MODE"]:
+        raise ValueError("Payment mode mismatch")
+    data = paystack_request(app, "GET", "/transaction/verify/" + donation.paystack_reference)
+    if (data.get("reference") != donation.paystack_reference
+            or type(data.get("amount")) is not int
+            or data["amount"] != minor_units(donation.amount)
+            or data.get("currency") != donation.currency
+            or data.get("domain") != donation.payment_mode
+            or data.get("channel") != "card"):
+        raise ValueError("Payment details mismatch")
+    if data.get("status") != "success":
+        return False
+    # One atomic, idempotent update; a later verified success can settle a cancelled checkout.
+    Donation.query.filter(Donation.id == donation.id, Donation.status != "completed").update(
+        {Donation.status: "completed"}, synchronize_session="fetch")
+    db.session.commit()
+    return True
 
 
 def admin_required(view):
@@ -156,6 +111,37 @@ def admin_required(view):
 
 
 def register_routes(app):
+
+    @app.context_processor
+    def search_metadata():
+        public_pages = {"index", "projects", "donate", "contact"}
+        descriptions = {
+            "index": "Mokatoria Community Foundation supports children and families through clean water, food, education, and mental wellbeing. Based in Nairobi, Kenya.",
+            "projects": "Explore the community projects of Mokatoria Community Foundation in water, nutrition, education, and mental wellbeing.",
+            "donate": "Support Mokatoria Community Foundation through PayPal or a KES bank transfer. View receiving details and contact us to confirm your contribution.",
+            "contact": "Contact Mokatoria Community Foundation at mokatoriafoundation@gmail.com or +254 743 563 077. Find us on Tom Mboya Street, Nairobi, Kenya.",
+        }
+        canonical = "https://mokatoriagroupfoundation.com" + request.path if request.endpoint in public_pages else None
+        return {"canonical_url": canonical, "page_description": descriptions.get(request.endpoint, "Mokatoria Community Foundation"), "public_search_page": request.endpoint in public_pages}
+
+    @app.route("/robots.txt")
+    def robots():
+        return Response("User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /thank-you/\nDisallow: /paystack/\nDisallow: /donation/\nSitemap: https://mokatoriagroupfoundation.com/sitemap.xml\n", mimetype="text/plain")
+
+    @app.route("/sitemap.xml")
+    def sitemap():
+        from xml.etree.ElementTree import Element, SubElement, tostring
+        root = Element("urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
+        for path in ("/", "/projects", "/donate", "/contact"):
+            item = SubElement(root, "url")
+            SubElement(item, "loc").text = "https://mokatoriagroupfoundation.com" + path
+        return Response(tostring(root, encoding="utf-8", xml_declaration=True), mimetype="application/xml")
+
+    @app.after_request
+    def private_page_search_headers(response):
+        if request.path.startswith(("/admin", "/thank-you", "/paystack", "/donation")):
+            response.headers["X-Robots-Tag"] = "noindex, nofollow"
+        return response
 
     # ---------------------------------------------------------
     # ADMIN LOGIN
@@ -214,7 +200,7 @@ def register_routes(app):
     # ADMIN LOGOUT
     # ---------------------------------------------------------
 
-    @app.route("/admin/logout")
+    @app.route("/admin/logout", methods=["POST"])
     def admin_logout():
 
         session.clear()
@@ -237,11 +223,11 @@ def register_routes(app):
                 0,
             )
         ).filter(
-            Donation.status == "completed"
+            Donation.status == "completed", Donation.currency == "KES", Donation.payment_mode == "live"
         ).scalar()
 
         count = Donation.query.filter_by(
-            status="completed"
+            status="completed", currency="KES", payment_mode="live"
         ).count()
 
         return render_template(
@@ -285,306 +271,76 @@ def register_routes(app):
     )
     def donate():
 
-        form = DonationForm()
+        # Payments are made externally and confirmed manually, never by a browser return.
+        if request.method == "POST":
+            flash("Please use the PayPal or bank-transfer instructions below.", "info")
+            return redirect(url_for("donate"), code=303)
+        return render_template("donate.html")
 
-        if form.validate_on_submit():
-
-            donation = Donation(
-                name=form.name.data.strip(),
-                email=form.email.data.strip(),
-                amount=round(
-                    form.amount.data,
-                    2,
-                ),
-                message=(
-                    form.message.data or ""
-                ).strip(),
-                status="pending",
-            )
-
-            db.session.add(donation)
-            db.session.commit()
-
-            # Local demo mode if PayPal credentials
-            # are not configured.
-            if app.config["DEMO_MODE"]:
-
-                donation.status = "completed"
-
-                db.session.commit()
-
-                return redirect(
-                    url_for(
-                        "thank_you",
-                        donation_id=donation.id,
-                    )
-                )
-
-            try:
-
-                order = create_paypal_order(
-                    app,
-                    donation,
-                )
-
-                donation.paypal_order_id = order["id"]
-
-                db.session.commit()
-
-                return redirect(
-                    url_for(
-                        "paypal_checkout",
-                        donation_id=donation.id,
-                    )
-                )
-
-            except Exception as exc:
-
-                app.logger.exception(
-                    "PayPal order creation failed: %s",
-                    exc,
-                )
-
-                donation.status = "cancelled"
-
-                db.session.commit()
-
-                flash(
-                    "We couldn't start the payment process. "
-                    "Please try again.",
-                    "error",
-                )
-
-                return redirect(
-                    url_for("donate")
-                )
-
-        return render_template(
-            "donate.html",
-            form=form,
-            demo_mode=app.config["DEMO_MODE"],
-            paypal_client_id=app.config[
-                "PAYPAL_CLIENT_ID"
-            ],
-        )
-
-
-    # ---------------------------------------------------------
-    # PAYPAL CHECKOUT PAGE
-    # ---------------------------------------------------------
-
-    @app.route(
-        "/paypal/checkout/<int:donation_id>"
-    )
-    def paypal_checkout(donation_id):
-
-        donation = Donation.query.get_or_404(
-            donation_id
-        )
-
-        if not donation.paypal_order_id:
-
-            flash(
-                "The PayPal payment could not be started.",
-                "error",
-            )
-
-            return redirect(
-                url_for("donate")
-            )
-
-        return render_template(
-            "paypal_checkout.html",
-            donation=donation,
-            paypal_client_id=app.config[
-                "PAYPAL_CLIENT_ID"
-            ],
-        )
-
-
-    # ---------------------------------------------------------
-    # PAYPAL CAPTURE
-    # ---------------------------------------------------------
-
-    @app.route(
-        "/paypal/capture",
-        methods=["POST"],
-    )
-    def paypal_capture():
-
-        data = request.get_json(
-            silent=True
-        ) or {}
-
-        order_id = data.get(
-            "order_id"
-        )
-
-        if not order_id:
-
-            return jsonify({
-                "success": False,
-                "error": "Missing PayPal order ID.",
-            }), 400
-
-        donation = Donation.query.filter_by(
-            paypal_order_id=order_id
-        ).first()
-
-        if not donation:
-
-            return jsonify({
-                "success": False,
-                "error": "Donation not found.",
-            }), 404
-
-        if donation.status == "completed":
-
-            return jsonify({
-                "success": True,
-                "donation_id": donation.id,
-            })
-
+    @app.route("/paystack/callback")
+    def paystack_callback():
+        reference = request.args.get("reference", "")
+        donation = Donation.query.filter_by(paystack_reference=reference).first_or_404()
+        if donation.payment_mode == "demo":
+            abort(400)
+        session["donation_id"] = donation.id
         try:
+            if verify_donation(app, donation):
+                return redirect(url_for("thank_you", donation_id=donation.id))
+        except (requests.RequestException, ValueError, RuntimeError, TypeError):
+            app.logger.warning("Payment verification failed for donation %s", donation.id)
+        return render_template("payment_pending.html", donation=donation), 202
 
-            result = capture_paypal_order(
-                app,
-                order_id,
-            )
+    @app.route("/admin/donations/<int:donation_id>/verify", methods=["POST"])
+    @admin_required
+    def admin_verify(donation_id):
+        donation = db.get_or_404(Donation, donation_id)
+        if not donation.paystack_reference or donation.payment_mode not in {"test", "live"}:
+            abort(400)
+        try:
+            confirmed = verify_donation(app, donation)
+            flash("Payment confirmed." if confirmed else "Payment remains unconfirmed.", "info")
+        except (requests.RequestException, ValueError, RuntimeError, TypeError):
+            flash("Verification unavailable or details do not match. Record left unchanged.", "error")
+        return redirect(url_for("admin_donations"))
 
-            if result.get("status") == "COMPLETED":
+    @app.route("/paystack/webhook", methods=["POST"])
+    @csrf.exempt
+    def paystack_webhook():
+        # The only CSRF exemption: authenticated provider-to-server notifications.
+        key = app.config["PAYSTACK_SECRET_KEY"]
+        if not key or not key.startswith("sk_" + app.config["PAYSTACK_MODE"] + "_"):
+            abort(503)
+        signature = hmac.new(key.encode(), request.get_data(), hashlib.sha512).hexdigest()
+        if not hmac.compare_digest(signature, request.headers.get("x-paystack-signature", "")):
+            abort(401)
+        event = request.get_json(silent=True)
+        if not isinstance(event, dict):
+            abort(400)
+        if event.get("event") != "charge.success":
+            return "", 200
+        data = event.get("data")
+        if not isinstance(data, dict) or not isinstance(data.get("reference"), str):
+            abort(400)
+        donation = Donation.query.filter_by(paystack_reference=data["reference"]).first()
+        if donation is None:
+            return "", 200
+        try:
+            if not verify_donation(app, donation):
+                abort(503)
+        except (requests.RequestException, ValueError, RuntimeError, TypeError):
+            abort(503)  # Provider can retry; never trust webhook amounts alone.
+        return "", 200
 
-                try:
-                    capture = (
-                        result["purchase_units"][0]
-                        ["payments"]["captures"][0]
-                    )
-
-                    captured_amount = capture["amount"]["value"]
-                    captured_currency = capture["amount"]["currency_code"]
-
-                    expected_amount = Decimal(
-                        f"{donation.amount:.2f}"
-                    )
-                    actual_amount = Decimal(
-                        str(captured_amount)
-                    )
-
-                except (KeyError, IndexError, TypeError, ValueError):
-                    app.logger.exception(
-                        "PayPal capture response was missing expected payment details."
-                    )
-
-                    return jsonify({
-                        "success": False,
-                        "error": "PayPal returned an invalid payment response.",
-                    }), 400
-
-                if captured_currency != "USD":
-                    app.logger.error(
-                        "PayPal currency mismatch for donation %s: expected USD, got %s",
-                        donation.id,
-                        captured_currency,
-                    )
-
-                    return jsonify({
-                        "success": False,
-                        "error": "Payment currency could not be verified.",
-                    }), 400
-
-                if actual_amount != expected_amount:
-                    app.logger.error(
-                        "PayPal amount mismatch for donation %s: expected %s, got %s",
-                        donation.id,
-                        expected_amount,
-                        actual_amount,
-                    )
-
-                    return jsonify({
-                        "success": False,
-                        "error": "Payment amount could not be verified.",
-                    }), 400
-
-                donation.status = "completed"
-
-                db.session.commit()
-
-                return jsonify({
-                    "success": True,
-                    "donation_id": donation.id,
-                })
-
-            app.logger.warning(
-                "PayPal order %s was not completed: %s",
-                order_id,
-                result,
-            )
-
-            return jsonify({
-                "success": False,
-                "error": (
-                    "PayPal did not confirm the payment."
-                ),
-            }), 400
-
-        except requests.HTTPError as exc:
-
-            app.logger.exception(
-                "PayPal capture failed: %s",
-                exc,
-            )
-
-            return jsonify({
-                "success": False,
-                "error": (
-                    "PayPal could not complete the payment."
-                ),
-            }), 400
-
-        except Exception as exc:
-
-            app.logger.exception(
-                "Unexpected PayPal capture error: %s",
-                exc,
-            )
-
-            return jsonify({
-                "success": False,
-                "error": (
-                    "An unexpected payment error occurred."
-                ),
-            }), 500
-
-
-    # ---------------------------------------------------------
-    # CANCEL DONATION
-    # ---------------------------------------------------------
-
-    @app.route(
-        "/donation/cancel/<int:donation_id>"
-    )
+    @app.route("/donation/cancel/<int:donation_id>", methods=["POST"])
     def donation_cancel(donation_id):
-
-        donation = Donation.query.get_or_404(
-            donation_id
-        )
-
-        if donation.status == "pending":
-
-            donation.status = "cancelled"
-
-            db.session.commit()
-
-        flash(
-            "Your donation was cancelled. "
-            "No payment was taken.",
-            "info",
-        )
-
-        return redirect(
-            url_for("donate")
-        )
-
+        if session.get("donation_id") != donation_id:
+            abort(404)
+        donation = db.get_or_404(Donation, donation_id)
+        Donation.query.filter_by(id=donation.id, status="pending").update({Donation.status: "cancelled"})
+        db.session.commit()
+        flash("Checkout cancelled. A payment already sent can still be confirmed; contact us before retrying.", "info")
+        return redirect(url_for("donate"))
 
     # ---------------------------------------------------------
     # THANK YOU
@@ -595,9 +351,10 @@ def register_routes(app):
     )
     def thank_you(donation_id):
 
-        donation = Donation.query.get_or_404(
-            donation_id
-        )
+        donation = db.get_or_404(Donation, donation_id)
+
+        if session.get("donation_id") != donation_id or donation.status != "completed":
+            abort(404)
 
         return render_template(
             "thank_you.html",
@@ -620,7 +377,7 @@ def register_routes(app):
         completed_donations = [
             donation
             for donation in donations
-            if donation.status == "completed"
+            if donation.status == "completed" and donation.currency == "KES" and donation.payment_mode == "live"
         ]
 
         completed_total = sum(
@@ -683,10 +440,12 @@ def register_routes(app):
             "ID",
             "Name",
             "Email",
-            "Amount USD",
+            "Amount",
+            "Currency",
+            "Mode",
             "Status",
             "Message",
-            "PayPal Order ID",
+            "Paystack Reference",
             "Date",
         ])
 
@@ -697,9 +456,11 @@ def register_routes(app):
                 donation.name,
                 donation.email,
                 f"{donation.amount:.2f}",
+                donation.currency,
+                donation.payment_mode,
                 donation.status,
                 donation.message or "",
-                donation.paypal_order_id or "",
+                donation.paystack_reference or "",
                 donation.created_at.strftime(
                     "%Y-%m-%d %H:%M:%S"
                 ),
@@ -719,7 +480,10 @@ def register_routes(app):
         )
 
 
-app = create_app()
+import os
+
+if os.getenv("FLASK_SKIP_STARTUP") != "1":
+    app = create_app()
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run(debug=False, port=5000)

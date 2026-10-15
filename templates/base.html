@@ -3,8 +3,23 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Give Back — uplifting children and families through clean water, nourishing food, education and mental health support.">
-  <title>{% block title %}Give Back{% endblock %}</title>
+  <meta name="description" content="{{ page_description }}">
+  {% if canonical_url %}
+  <link rel="canonical" href="{{ canonical_url }}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Mokatoria Community Foundation">
+  <meta property="og:title" content="{{ self.title()|striptags }}">
+  <meta property="og:description" content="{{ page_description }}">
+  <meta property="og:url" content="{{ canonical_url }}">
+  {% else %}<meta name="robots" content="noindex, nofollow">{% endif %}
+  <script type="application/ld+json">{{ {
+    "@context": "https://schema.org", "@type": "Organization",
+    "name": "Mokatoria Community Foundation",
+    "url": "https://mokatoriagroupfoundation.com/",
+    "email": "mokatoriafoundation@gmail.com", "telephone": "+254743563077",
+    "address": {"@type": "PostalAddress", "streetAddress": "Tom Mboya Street", "addressLocality": "Nairobi", "addressCountry": "KE"}
+  }|tojson }}</script>
+  <title>{% block title %}Mokatoria Community Foundation{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
@@ -14,11 +29,12 @@
   <div class="top-note">Small acts. Real impact. <span>Thank you for being part of it.</span></div>
   <header class="site-header">
     <div class="container nav-inner">
-      <a class="brand" href="{{ url_for('index') }}" aria-label="Give Back home">
+      <a class="brand" href="{{ url_for('index') }}" aria-label="Mokatoria Community Foundation home">
         <span class="brand-mark">+</span>
-        <span>Give Back</span>
+        <span>Mokatoria Community Foundation</span>
       </a>
-      <nav class="main-nav" aria-label="Main navigation">
+      <button class="mobile-menu-toggle" type="button" aria-expanded="false" aria-controls="main-navigation" hidden>Menu <span aria-hidden="true">☰</span></button>
+      <nav id="main-navigation" class="main-nav" aria-label="Main navigation">
         <a href="{{ url_for('index') }}">Home</a>
         <a href="{{ url_for('index') }}#mission">Our mission</a>
         <a href="{{ url_for('index') }}#impact">Our impact</a>
@@ -47,7 +63,7 @@
   <footer class="site-footer">
     <div class="container footer-grid">
       <div>
-        <a class="brand footer-brand" href="{{ url_for('index') }}"><span class="brand-mark">+</span><span>Give Back</span></a>
+        <a class="brand footer-brand" href="{{ url_for('index') }}"><span class="brand-mark">+</span><span>Mokatoria Community Foundation</span></a>
         <p>Uplifting children and families by strengthening the foundations of a dignified life: clean water, nourishing food, education and mental wellbeing.</p>
       </div>
       <div class="footer-links">
@@ -60,17 +76,42 @@
       </div>
       <div class="footer-links">
         <strong>Contact</strong>
-        <span>mokatoriafoundation.com.</span>
+        <a href="mailto:mokatoriafoundation@gmail.com">mokatoriafoundation@gmail.com</a>
+        <a href="tel:+254743563077">+254 743 563 077</a>
+        <span>Tom Mboya Street, Nairobi, Kenya</span>
         <span>Building hope through community empowerment.</span>
       </div>
     </div>
     <div class="container footer-bottom">
-      <span>&copy; 2026 Give Back. All rights reserved.</span>
+      <span>&copy; 2026 Mokatoria Community Foundation. All rights reserved.</span>
       <span>Built for generosity.</span>
     </div>
 
-    </div>
-</div>
   </footer>
+<script>
+(function () {
+  const toggle = document.querySelector('.mobile-menu-toggle');
+  const nav = document.getElementById('main-navigation');
+  toggle.hidden = false;
+  document.documentElement.classList.add('menu-ready');
+  function closeMenu() {
+    toggle.setAttribute('aria-expanded', 'false');
+    nav.classList.remove('is-open');
+  }
+  toggle.addEventListener('click', function () {
+    const open = toggle.getAttribute('aria-expanded') !== 'true';
+    toggle.setAttribute('aria-expanded', String(open));
+    nav.classList.toggle('is-open', open);
+  });
+  nav.addEventListener('click', function (event) {
+    if (event.target.closest('a')) closeMenu();
+  });
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+      closeMenu(); toggle.focus();
+    }
+  });
+})();
+</script>
 </body>
 </html>

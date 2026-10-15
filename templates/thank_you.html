@@ -1,12 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}Thank You — Give Back{% endblock %}
+{% block title %}Thank You — Mokatoria Community Foundation{% endblock %}
 
 {% block content %}
 
 <section class="section thank-you-page">
     <div class="container">
         <div class="thank-you-card">
+            {% if donation.payment_mode in ['test', 'demo'] %}<div class="demo-note">{{donation.payment_mode|title}} donation only. No real money was collected.</div>{% endif %}
+            <p>{{donation.currency}} {{"%.2f"|format(donation.amount)}}</p>
+            <p>Reference: {{donation.paystack_reference}}</p>
 
             <div class="thank-you-icon">
                 ✓

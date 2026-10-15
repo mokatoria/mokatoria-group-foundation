@@ -1,13 +1,19 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, FloatField, TextAreaField
-from wtforms.validators import DataRequired, Email, NumberRange, Length, Optional
-
+from wtforms import StringField, DecimalField, TextAreaField, SubmitField
+from wtforms.validators import DataRequired, Email, Length, ValidationError
+from decimal import Decimal, InvalidOperation
 
 class DonationForm(FlaskForm):
-    name = StringField("Full name", validators=[DataRequired(), Length(max=120)])
-    email = StringField("Email", validators=[DataRequired(), Email(), Length(max=120)])
-    amount = FloatField(
-        "Amount (USD)",
-        validators=[DataRequired(), NumberRange(min=1, max=100000, message="Enter an amount between $1 and $100,000")],
-    )
-    message = TextAreaField("Message (optional)", validators=[Optional(), Length(max=500)])
+    name = StringField('Name', validators=[DataRequired(), Length(max=120)])
+    email = StringField('Email', validators=[DataRequired(), Email(), Length(max=120)])
+    amount = DecimalField('Amount (KES)', places=None, validators=[DataRequired()])
+    message = TextAreaField('Message (optional)', validators=[Length(max=500)])
+    submit = SubmitField('Continue to card payment')
+
+    def validate_amount(self, field):
+        try:
+            value = field.data
+            if not value.is_finite() or value < 1 or value > 10000000 or value != value.quantize(Decimal('0.01')):
+                raise ValueError()
+        except (ValueError, InvalidOperation, AttributeError):
+            raise ValidationError('Enter 1–10,000,000 KES with at most two decimal places.')

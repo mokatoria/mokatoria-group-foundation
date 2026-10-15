@@ -1,43 +1,37 @@
 {% extends "base.html" %}
-
-{% block title %}Contact Us — Give Back{% endblock %}
-
+{% block title %}Contact — Mokatoria Community Foundation{% endblock %}
 {% block content %}
-<section class="section">
-    <div class="container">
-        <div class="section-heading">
-            <span class="eyebrow">Get in touch</span>
-            <h1>Contact us</h1>
-            <p>
-                We'd love to hear from you, answer your questions, and
-                connect you with the work happening in our communities.
-            </p>
-        </div>
-
-        <div class="contact-grid">
-            <div class="card">
-                <span class="eyebrow">Our address</span>
-                <h2>Visit us</h2>
-
-                <p>
-                    Mokatoria Group Foundation<br>
-                    Tom Mboya Street<br>
-                    Nairobi<br>
-                    Kenya
-                </p>
-            </div>
-
-            <div class="card">
-                <span class="eyebrow">Connect with us</span>
-                <h2>We'd love to hear from you</h2>
-
-                <p>
-                    For questions about our projects, donations,
-                    partnerships, or volunteering, please get in touch
-                    with our organization.
-                </p>
-            </div>
-        </div>
+<section class="foundation-contact">
+  <div class="container">
+    <div class="contact-intro">
+      <span class="eyebrow">We're here to help</span>
+      <h1>Let’s make a difference, <em>together.</em></h1>
+      <p>Have a question about our work, a donation, or getting involved? Contact Mokatoria Community Foundation.</p>
     </div>
+    <div class="foundation-contact-grid">
+      <article class="contact-detail-card">
+        <span class="contact-card-label">01 / Email</span>
+        <h2>Start a conversation</h2>
+        <p>For donations, partnerships, volunteering, and general enquiries.</p>
+        <a href="mailto:mokatoriafoundation@gmail.com">mokatoriafoundation@gmail.com</a>
+      </article>
+      <article class="contact-detail-card">
+        <span class="contact-card-label">02 / Phone</span>
+        <h2>Give us a call</h2>
+        <p>Speak with us about the foundation and how you can support our work.</p>
+        <a href="tel:+254743563077">+254 743 563 077</a>
+      </article>
+      <article class="contact-detail-card">
+        <span class="contact-card-label">03 / Address</span>
+        <h2>Find us in Nairobi</h2>
+        <address>Mokatoria Community Foundation<br>Tom Mboya Street<br>Nairobi, Kenya</address>
+      </article>
+    </div>
+    <div class="donation-contact-note">
+      <h2>Asking about a donation?</h2>
+      <p>Email us the payment reference, date, amount, and currency. We will check the receiving account to confirm your contribution. Please do not send passwords, PINs, or verification codes.</p>
+      <a class="btn-secondary" href="{{ url_for('donate') }}">View ways to give →</a>
+    </div>
+  </div>
 </section>
 {% endblock %}

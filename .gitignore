@@ -34,3 +34,5 @@ htmlcov/
 
 # Logs
 *.log
+# Local application backups (never publish old code or donor databases)
+backup_before_*/
