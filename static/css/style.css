@@ -420,3 +420,5 @@ button, input, textarea { font: inherit; }
 .pillar-card-illustrated p { font-size: .92rem; line-height: 1.8; }
 .pillar-illustration-note { margin: 16px 0 28px; color: var(--muted); font-size: .75rem; }
 @media (max-width: 650px) { .pillar-grid-illustrated { grid-template-columns: 1fr; gap: 20px; } .pillar-body { padding: 22px; } }
+
+.neema-option { margin-top: 16px; }

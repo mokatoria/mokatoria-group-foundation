@@ -48,6 +48,9 @@ def test_external_payment_details_and_no_false_confirmation(client, app):
     assert 'p84669324@gmail.com' in html and '7770179484119' in html
     assert '<details class="payment-option bank-option">' in html
     assert 'EQBLKENA' in html and 'KES (Kenyan shillings)' in html
+    assert '00151432' in html and 'Neema · Israel' in html
+    assert 'Transfers from Israeli banks only.' in html
+    assert 'confirm the correct deposit instructions directly with Neema' in html
     # Unauthenticated submissions must still require a CSRF token.
     assert client.post('/donate', data={'amount': '100'}).status_code == 400
     with app.app_context():
