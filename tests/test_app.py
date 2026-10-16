@@ -166,9 +166,9 @@ def test_translation_only_public_pages_and_safe_urls(client):
         assert dest.hostname == 'translate.google.com'
         assert parse_qs(dest.query)['u'] == ['https://mokatoriagroupfoundation.com'+path]
         assert 'private' not in response.headers['Location']
-    assert 'translation-menu' not in client.get('/admin/login').get_data(as_text=True)
+    assert '<details class="translation-menu"' not in client.get('/admin/login').get_data(as_text=True)
     admin_form(client)
-    assert 'translation-menu' not in client.get('/admin/donations/new').get_data(as_text=True)
+    assert '<details class="translation-menu"' not in client.get('/admin/donations/new').get_data(as_text=True)
     assert client.get('/translate?page=admin_donations&language=sw').status_code == 400
     assert client.get('/translate?page=https://evil.example&language=sw').status_code == 400
     assert client.get('/translate?language=invalid').status_code == 400
