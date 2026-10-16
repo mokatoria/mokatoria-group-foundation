@@ -61,6 +61,17 @@ def create_app(config_class=Config):
 
     register_routes(app)
 
+    @app.errorhandler(404)
+    def page_not_found(error):
+        return render_template("error.html", error_title="Page not found",
+                               error_message="This page may have moved. You can return home or contact us for help."), 404
+
+    @app.errorhandler(500)
+    def server_error(error):
+        db.session.rollback()
+        return render_template("error.html", error_title="Please try again shortly",
+                               error_message="We could not load this page. If you were recording a payment, check your donation records before trying again."), 500
+
     return app
 
 

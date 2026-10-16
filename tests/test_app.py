@@ -210,3 +210,26 @@ def test_donor_information_links_and_accurate_limits(client):
     assert 'does not establish tax deductibility' in giving
     assert '16 October 2026' in privacy and '16 October 2026' in giving
     assert 'X-Robots-Tag' not in client.get('/donation-information').headers
+
+
+def test_missing_page_offers_recovery_without_indexing(client):
+    response = client.get('/this-page-does-not-exist')
+    assert response.status_code == 404
+    html = response.get_data(as_text=True)
+    assert 'Page not found' in html
+    assert 'Return home' in html
+    assert 'noindex' in html
+
+
+def test_server_error_rolls_back_and_offers_safe_retry(app):
+    app.config['PROPAGATE_EXCEPTIONS'] = False
+
+    @app.route('/test-failure')
+    def fail():
+        raise RuntimeError('private diagnostic detail')
+
+    response = app.test_client().get('/test-failure')
+    assert response.status_code == 500
+    html = response.get_data(as_text=True)
+    assert 'check your donation records before trying again' in html
+    assert 'private diagnostic detail' not in html
