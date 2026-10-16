@@ -501,3 +501,10 @@ button, input, textarea { font: inherit; }
 .policy-contact-card { padding: 28px; border-radius: 20px; background: var(--green-100); }.policy-contact-card .btn-primary { color: white; }
 .footer-policy-links { display: flex; flex-wrap: wrap; gap: 18px; }
 @media(max-width:800px) { .policy-layout { grid-template-columns: 1fr; gap: 30px; }.policy-nav { flex-direction: row; flex-wrap: wrap; }.policy-page { padding-top: 42px; }.policy-heading { margin-bottom: 30px; } }
+
+.foundation-impact-overview { padding: 45px 0; background: var(--green-100); }
+.foundation-impact-overview h2 { color: var(--green-950); margin: 12px 0 24px; font-size: 1.7rem; }
+.foundation-impact-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 24px; }
+.foundation-impact-grid strong, .foundation-impact-grid span { display: block; }.foundation-impact-grid strong { font-size: 2.2rem; color: var(--green-700); }.foundation-impact-grid span { color: var(--green-900); font-size: .9rem; }
+.foundation-impact-overview p { color: var(--muted); font-size: .85rem; max-width: 850px; }.foundation-impact-overview a { color: var(--green-700); font-weight: 700; font-size: .85rem; }
+@media(max-width:600px) { .foundation-impact-grid { grid-template-columns: 1fr; gap: 20px; } }
