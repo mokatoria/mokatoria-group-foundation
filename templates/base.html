@@ -39,6 +39,18 @@
         <span class="brand-mark">+</span>
         <span translate="no" class="notranslate">Mokatoria Community Foundation</span>
       </a>
+      {% if public_search_page %}
+      <details class="translation-menu" translate="no">
+        <summary aria-label="Translate website" title="Translate website">
+          <svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h12M9 3v2M6 5c0 6 5 10 8 11M13 5C12 10 8 14 3 16M14 21l4-10 4 10M15.5 17h5"/></svg>
+        </summary>
+        <div class="translation-choices" aria-label="Choose a language">
+          <a href="{{ url_for(request.endpoint) }}" lang="en">English</a>
+          {% for code, label in translation_languages %}<a href="{{ url_for('translate_page', page=request.endpoint, language=code) }}" lang="{{ code }}" target="_blank" rel="noopener noreferrer">{{ label }}</a>{% endfor %}
+          <a href="{{ url_for('translate_page', page=request.endpoint, language='more') }}" target="_blank" rel="noopener noreferrer">More languages…</a>
+        </div>
+      </details>
+      {% endif %}
       <button class="mobile-menu-toggle" type="button" aria-expanded="false" aria-controls="main-navigation" hidden>Menu <span aria-hidden="true">☰</span></button>
       <nav id="main-navigation" class="main-nav" aria-label="Main navigation">
         <a href="{{ url_for('index') }}">Home</a>
@@ -50,23 +62,6 @@
         <a href="{{ url_for('donate') }}" class="btn-nav">Donate</a>
       </nav>
     </div>
-    {% if public_search_page %}
-    <div class="language-bar">
-      <div class="container language-inner">
-        <form class="language-form" method="get" action="{{ url_for('translate_page') }}" target="_blank" rel="noopener noreferrer" translate="no">
-          <input type="hidden" name="page" value="{{ request.endpoint }}">
-          <label for="site-language">Language / Lugha</label>
-          <select id="site-language" name="language">
-            <option value="en">English — original</option>
-            {% for code, label in translation_languages %}<option value="{{ code }}">{{ label }}</option>{% endfor %}
-            <option value="more">More languages…</option>
-          </select>
-          <button type="submit">Translate ↗</button>
-        </form>
-        <span class="language-note">Opens Google Translate · Automatic translation</span>
-      </div>
-    </div>
-    {% endif %}
   </header>
 
   <main>
@@ -113,6 +108,15 @@
   </footer>
 <script>
 (function () {
+  const picker = document.querySelector('.translation-menu');
+  document.addEventListener('click', function (event) {
+    if (picker && !picker.contains(event.target)) picker.open = false;
+  });
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape' && picker && picker.open) {
+      picker.open = false; picker.querySelector('summary').focus();
+    }
+  });
   const toggle = document.querySelector('.mobile-menu-toggle');
   const nav = document.getElementById('main-navigation');
   toggle.hidden = false;

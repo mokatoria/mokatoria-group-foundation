@@ -158,16 +158,17 @@ def test_translation_only_public_pages_and_safe_urls(client):
     from urllib.parse import urlparse, parse_qs
     for page, path in [('index','/'), ('donate','/donate'), ('contact','/contact'), ('projects','/projects')]:
         html = client.get(path).get_data(as_text=True)
-        assert 'Language / Lugha' in html and 'Kiswahili' in html
+        assert 'aria-label="Translate website"' in html and 'Kiswahili' in html
+        assert 'Language / Lugha' not in html and 'Automatic translation' not in html
         response = client.get('/translate', query_string={'page':page,'language':'sw','email':'private@example.com'})
         assert response.status_code == 302
         dest = urlparse(response.headers['Location'])
         assert dest.hostname == 'translate.google.com'
         assert parse_qs(dest.query)['u'] == ['https://mokatoriagroupfoundation.com'+path]
         assert 'private' not in response.headers['Location']
-    assert 'site-language' not in client.get('/admin/login').get_data(as_text=True)
+    assert 'translation-menu' not in client.get('/admin/login').get_data(as_text=True)
     admin_form(client)
-    assert 'site-language' not in client.get('/admin/donations/new').get_data(as_text=True)
+    assert 'translation-menu' not in client.get('/admin/donations/new').get_data(as_text=True)
     assert client.get('/translate?page=admin_donations&language=sw').status_code == 400
     assert client.get('/translate?page=https://evil.example&language=sw').status_code == 400
     assert client.get('/translate?language=invalid').status_code == 400
