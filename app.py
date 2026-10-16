@@ -131,8 +131,10 @@ def register_routes(app):
 
     @app.context_processor
     def search_metadata():
-        public_pages = {"index", "projects", "donate", "contact", "outreach"}
+        public_pages = {"index", "projects", "donate", "contact", "outreach", "privacy", "donation_information"}
         descriptions = {
+            "privacy": "How Mokatoria Community Foundation handles enquiries, donation records, privacy requests, and external website services.",
+            "donation_information": "Read about receiving accounts, donation confirmation, receipts, fees, and payment concerns at Mokatoria Community Foundation.",
             "outreach": "Explore Mokatoria Community Foundation outreach in Kitui, Eldoret and India, and meet our five-member leadership team.",
             "index": "Mokatoria Community Foundation supports children and families through clean water, food, education, and mental wellbeing. Based in Nairobi, Kenya.",
             "projects": "Explore the community projects of Mokatoria Community Foundation in water, nutrition, education, and mental wellbeing.",
@@ -146,7 +148,7 @@ def register_routes(app):
     def translate_page():
         language = request.args.get("language", "")
         page = request.args.get("page", "index")
-        if page not in {"index", "projects", "donate", "contact", "outreach"}:
+        if page not in {"index", "projects", "donate", "contact", "outreach", "privacy", "donation_information"}:
             abort(400)
         if language == "en":
             return redirect(url_for(page))
@@ -166,14 +168,14 @@ def register_routes(app):
     def sitemap():
         from xml.etree.ElementTree import Element, SubElement, tostring
         root = Element("urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
-        for path in ("/", "/projects", "/donate", "/contact", "/outreach"):
+        for path in ("/", "/projects", "/donate", "/contact", "/outreach", "/privacy", "/donation-information"):
             item = SubElement(root, "url")
             SubElement(item, "loc").text = "https://mokatoriagroupfoundation.com" + path
         return Response(tostring(root, encoding="utf-8", xml_declaration=True), mimetype="application/xml")
 
     @app.after_request
     def private_page_search_headers(response):
-        if request.path.startswith(("/admin", "/thank-you", "/paystack", "/donation")):
+        if request.path.startswith(("/admin", "/thank-you", "/paystack", "/donation/")):
             response.headers["X-Robots-Tag"] = "noindex, nofollow"
             response.headers["Cache-Control"] = "no-store"
         return response
@@ -276,6 +278,14 @@ def register_routes(app):
     # ---------------------------------------------------------
     # CONTACT
     # ---------------------------------------------------------
+
+    @app.route("/privacy")
+    def privacy():
+        return render_template("privacy.html")
+
+    @app.route("/donation-information")
+    def donation_information():
+        return render_template("donation_information.html")
 
     @app.route("/outreach")
     def outreach():

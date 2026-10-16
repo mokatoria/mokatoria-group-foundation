@@ -31,7 +31,7 @@ def client(app):
     return app.test_client()
 
 
-@pytest.mark.parametrize('path', ['/', '/projects', '/donate', '/contact', '/outreach'])
+@pytest.mark.parametrize('path', ['/', '/projects', '/donate', '/contact', '/outreach', '/privacy', '/donation-information'])
 def test_public_identity_and_search_metadata(client, path):
     response = client.get(path)
     assert response.status_code == 200
@@ -62,7 +62,7 @@ def test_external_payment_details_and_no_false_confirmation(client, app):
 def test_sitemap_and_robots(client):
     root = ElementTree.fromstring(client.get('/sitemap.xml').data)
     urls = {item[0].text for item in root}
-    assert urls == {'https://mokatoriagroupfoundation.com' + path for path in ['/', '/projects', '/donate', '/contact', '/outreach']}
+    assert urls == {'https://mokatoriagroupfoundation.com' + path for path in ['/', '/projects', '/donate', '/contact', '/outreach', '/privacy', '/donation-information']}
     assert b'Sitemap: https://mokatoriagroupfoundation.com/sitemap.xml' in client.get('/robots.txt').data
 
 
@@ -156,10 +156,11 @@ def test_invalid_manual_records_are_not_saved(client, app, changes):
 
 def test_translation_only_public_pages_and_safe_urls(client):
     from urllib.parse import urlparse, parse_qs
-    for page, path in [('index','/'), ('donate','/donate'), ('contact','/contact'), ('projects','/projects'), ('outreach','/outreach')]:
+    for page, path in [('index','/'), ('donate','/donate'), ('contact','/contact'), ('projects','/projects'), ('outreach','/outreach'), ('privacy','/privacy'), ('donation_information','/donation-information')]:
         html = client.get(path).get_data(as_text=True)
         assert 'aria-label="Translate website"' in html and 'Kiswahili' in html
-        assert 'Language / Lugha' not in html and 'Automatic translation' not in html
+        header = html.split('</header>', 1)[0]
+        assert 'Language / Lugha' not in header and 'Automatic translation' not in header
         response = client.get('/translate', query_string={'page':page,'language':'sw','email':'private@example.com'})
         assert response.status_code == 302
         dest = urlparse(response.headers['Location'])
@@ -195,3 +196,17 @@ def test_outreach_content_and_privacy(client):
     assert '<img' not in html
     assert 'Nairobi, Kenya' in html
     assert 'data-public-url="https://mokatoriagroupfoundation.com/outreach"' in html
+
+
+def test_donor_information_links_and_accurate_limits(client):
+    for path in ['/', '/donate', '/contact']:
+        html = client.get(path).get_data(as_text=True)
+        assert 'href="/privacy"' in html and 'href="/donation-information"' in html
+    privacy = client.get('/privacy').get_data(as_text=True)
+    giving = client.get('/donation-information').get_data(as_text=True)
+    assert 'Google Translate' in privacy and 'Render' in privacy
+    assert 'review requests individually' in giving
+    assert 'personal accounts held by Collins Mokaya Onyancha' in giving
+    assert 'does not establish tax deductibility' in giving
+    assert '16 October 2026' in privacy and '16 October 2026' in giving
+    assert 'X-Robots-Tag' not in client.get('/donation-information').headers

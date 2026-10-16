@@ -487,3 +487,17 @@ button, input, textarea { font: inherit; }
 .outreach-project-link { padding-top: 24px; color: var(--green-700); font-size: .85rem; }
 @media(max-width:900px) { .outreach-visits, .leadership-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @media(max-width:600px) { .outreach-visits, .leadership-grid { grid-template-columns: 1fr; }.outreach-hero { padding: 48px 0 35px; }.outreach-section { padding: 48px 0; }.outreach-visit, .leadership-card, .foundation-registration { padding: 24px; } }
+
+/* Clear information for visitors and donors */
+.policy-page { padding-top: 60px; padding-bottom: 80px; }
+.policy-heading { max-width: 780px; margin-bottom: 48px; }
+.policy-heading h1 { font-family: 'Playfair Display', Georgia, serif; color: var(--green-950); font-size: clamp(2.6rem,5vw,4rem); line-height: 1.1; margin: 18px 0; }
+.policy-heading p { color: var(--muted); font-size: 1.05rem; }.policy-heading small { color: var(--muted); font-size: .78rem; }
+.policy-layout { display: grid; grid-template-columns: 220px minmax(0,1fr); gap: 58px; align-items: start; }
+.policy-nav { display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: 16px; background: var(--green-100); }
+.policy-nav a { color: var(--green-900); text-decoration: none; font-size: .85rem; }.policy-nav a:hover { text-decoration: underline; }
+.policy-copy { max-width: 790px; }.policy-copy section { margin-bottom: 38px; scroll-margin-top: 120px; }.policy-copy h2 { font-size: 1.4rem; color: var(--green-950); margin: 0 0 14px; }.policy-copy h3 { font-size: 1.05rem; }
+.policy-copy p, .policy-copy li, .policy-copy address { color: var(--muted); font-size: .94rem; line-height: 1.85; font-style: normal; }.policy-copy a { color: var(--green-700); text-underline-offset: 3px; overflow-wrap: anywhere; }.policy-copy li { margin-bottom: 10px; }
+.policy-contact-card { padding: 28px; border-radius: 20px; background: var(--green-100); }.policy-contact-card .btn-primary { color: white; }
+.footer-policy-links { display: flex; flex-wrap: wrap; gap: 18px; }
+@media(max-width:800px) { .policy-layout { grid-template-columns: 1fr; gap: 30px; }.policy-nav { flex-direction: row; flex-wrap: wrap; }.policy-page { padding-top: 42px; }.policy-heading { margin-bottom: 30px; } }
