@@ -2,7 +2,7 @@ import secrets
 import hashlib
 import hmac
 import json
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlencode
 from schema_upgrade import upgrade_payment_schema
 import csv
 import io
@@ -32,6 +32,16 @@ from models import Donation
 from forms import DonationForm, RecordPaymentForm
 from datetime import datetime, timezone
 from sqlalchemy.exc import IntegrityError
+
+PUBLIC_LANGUAGES = [
+    ('sw', 'Kiswahili'), ('he', 'עברית'), ('ar', 'العربية'),
+    ('fr', 'Français'), ('es', 'Español'), ('pt', 'Português'),
+    ('de', 'Deutsch'), ('it', 'Italiano'), ('ru', 'Русский'),
+    ('uk', 'Українська'), ('am', 'አማርኛ'), ('so', 'Soomaali'),
+    ('rw', 'Kinyarwanda'), ('lg', 'Luganda'), ('hi', 'हिन्दी'),
+    ('bn', 'বাংলা'), ('ur', 'اردو'), ('zh-CN', '中文（简体）'),
+    ('ja', '日本語'), ('ko', '한국어'), ('tr', 'Türkçe'),
+]
 
 csrf = CSRFProtect()
 
@@ -129,7 +139,23 @@ def register_routes(app):
             "contact": "Contact Mokatoria Community Foundation at mokatoriafoundation@gmail.com or +254 743 563 077. Find us on Tom Mboya Street, Nairobi, Kenya.",
         }
         canonical = "https://mokatoriagroupfoundation.com" + request.path if request.endpoint in public_pages else None
-        return {"canonical_url": canonical, "page_description": descriptions.get(request.endpoint, "Mokatoria Community Foundation"), "public_search_page": request.endpoint in public_pages}
+        return {"canonical_url": canonical, "page_description": descriptions.get(request.endpoint, "Mokatoria Community Foundation"), "public_search_page": request.endpoint in public_pages, "translation_languages": PUBLIC_LANGUAGES}
+
+    @app.route("/translate")
+    def translate_page():
+        language = request.args.get("language", "")
+        page = request.args.get("page", "index")
+        if page not in {"index", "projects", "donate", "contact"}:
+            abort(400)
+        if language == "en":
+            return redirect(url_for(page))
+        if language not in dict(PUBLIC_LANGUAGES) and language != "more":
+            abort(400)
+        # Only canonical public URLs are sent, never session data or query parameters.
+        public_url = "https://mokatoriagroupfoundation.com" + url_for(page)
+        if language == "more":
+            return redirect("https://translate.google.com/?" + urlencode({"sl": "en", "tl": "sw", "op": "websites", "text": public_url}))
+        return redirect("https://translate.google.com/translate?" + urlencode({"sl": "en", "tl": language, "u": public_url}))
 
     @app.route("/robots.txt")
     def robots():

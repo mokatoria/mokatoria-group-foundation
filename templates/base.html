@@ -37,7 +37,7 @@
     <div class="container nav-inner">
       <a class="brand" href="{{ url_for('index') }}" aria-label="Mokatoria Community Foundation home">
         <span class="brand-mark">+</span>
-        <span>Mokatoria Community Foundation</span>
+        <span translate="no" class="notranslate">Mokatoria Community Foundation</span>
       </a>
       <button class="mobile-menu-toggle" type="button" aria-expanded="false" aria-controls="main-navigation" hidden>Menu <span aria-hidden="true">☰</span></button>
       <nav id="main-navigation" class="main-nav" aria-label="Main navigation">
@@ -50,6 +50,23 @@
         <a href="{{ url_for('donate') }}" class="btn-nav">Donate</a>
       </nav>
     </div>
+    {% if public_search_page %}
+    <div class="language-bar">
+      <div class="container language-inner">
+        <form class="language-form" method="get" action="{{ url_for('translate_page') }}" target="_blank" rel="noopener noreferrer" translate="no">
+          <input type="hidden" name="page" value="{{ request.endpoint }}">
+          <label for="site-language">Language / Lugha</label>
+          <select id="site-language" name="language">
+            <option value="en">English — original</option>
+            {% for code, label in translation_languages %}<option value="{{ code }}">{{ label }}</option>{% endfor %}
+            <option value="more">More languages…</option>
+          </select>
+          <button type="submit">Translate ↗</button>
+        </form>
+        <span class="language-note">Opens Google Translate · Automatic translation</span>
+      </div>
+    </div>
+    {% endif %}
   </header>
 
   <main>
@@ -69,7 +86,7 @@
   <footer class="site-footer">
     <div class="container footer-grid">
       <div>
-        <a class="brand footer-brand" href="{{ url_for('index') }}"><span class="brand-mark">+</span><span>Mokatoria Community Foundation</span></a>
+        <a class="brand footer-brand" href="{{ url_for('index') }}"><span class="brand-mark">+</span><span translate="no" class="notranslate">Mokatoria Community Foundation</span></a>
         <p>Uplifting children and families by strengthening the foundations of a dignified life: clean water, nourishing food, education and mental wellbeing.</p>
       </div>
       <div class="footer-links">
@@ -82,8 +99,8 @@
       </div>
       <div class="footer-links">
         <strong>Contact</strong>
-        <a href="mailto:mokatoriafoundation@gmail.com">mokatoriafoundation@gmail.com</a>
-        <a href="tel:+254743563077">+254 743 563 077</a>
+        <a translate="no" class="notranslate" href="mailto:mokatoriafoundation@gmail.com">mokatoriafoundation@gmail.com</a>
+        <a translate="no" class="notranslate" href="tel:+254743563077">+254 743 563 077</a>
         <span>Tom Mboya Street, Nairobi, Kenya</span>
         <span>Building hope through community empowerment.</span>
       </div>

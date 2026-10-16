@@ -446,3 +446,15 @@ button, input, textarea { font: inherit; }
 .receipt-number { color: var(--muted); }.receipt-amount { font-size: 2.5rem; font-weight: 700; color: var(--green-700); margin: 24px 0 4px; }
 @media(max-width:650px) { .admin-form-grid { grid-template-columns: 1fr; }.admin-record-form, .payment-receipt { padding: 22px; } }
 @media print { .site-header, .top-note, .site-footer, .receipt-tools, .flash-wrap { display: none !important; }.admin-page { width: 100%; padding: 0; }.payment-receipt { border: 0; padding: 12mm; max-width: none; } body { background: white; } .payment-receipt { break-inside: avoid; } }
+
+/* Public page translation shortcut */
+.language-bar { background: var(--paper); border-top: 1px solid var(--line); }
+.language-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 20px; padding-top: 10px; padding-bottom: 10px; }
+.language-form { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 0; }
+.language-form label { color: var(--green-900); font-size: .78rem; font-weight: 700; }
+.language-form select { max-width: 210px; background: white; border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; color: var(--ink); font: inherit; font-size: .8rem; }
+.language-form button { background: var(--green-100); border: 1px solid var(--line); color: var(--green-900); border-radius: 8px; padding: 8px 12px; font-weight: 700; cursor: pointer; }
+.language-form button:hover { background: #d4e7db; }
+.language-form select:focus-visible, .language-form button:focus-visible { outline: 3px solid var(--green-600); outline-offset: 2px; }
+.language-note { font-size: .7rem; color: var(--muted); }
+@media(max-width:480px) { .language-inner { gap: 6px; }.language-form { gap: 7px; }.language-form label { width: 100%; }.language-form select { max-width: 185px; } }
