@@ -131,8 +131,9 @@ def register_routes(app):
 
     @app.context_processor
     def search_metadata():
-        public_pages = {"index", "projects", "donate", "contact"}
+        public_pages = {"index", "projects", "donate", "contact", "outreach"}
         descriptions = {
+            "outreach": "Explore Mokatoria Community Foundation outreach in Kitui, Eldoret and India, and meet our five-member leadership team.",
             "index": "Mokatoria Community Foundation supports children and families through clean water, food, education, and mental wellbeing. Based in Nairobi, Kenya.",
             "projects": "Explore the community projects of Mokatoria Community Foundation in water, nutrition, education, and mental wellbeing.",
             "donate": "Support Mokatoria Community Foundation through PayPal or a KES bank transfer. View receiving details and contact us to confirm your contribution.",
@@ -145,7 +146,7 @@ def register_routes(app):
     def translate_page():
         language = request.args.get("language", "")
         page = request.args.get("page", "index")
-        if page not in {"index", "projects", "donate", "contact"}:
+        if page not in {"index", "projects", "donate", "contact", "outreach"}:
             abort(400)
         if language == "en":
             return redirect(url_for(page))
@@ -165,7 +166,7 @@ def register_routes(app):
     def sitemap():
         from xml.etree.ElementTree import Element, SubElement, tostring
         root = Element("urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
-        for path in ("/", "/projects", "/donate", "/contact"):
+        for path in ("/", "/projects", "/donate", "/contact", "/outreach"):
             item = SubElement(root, "url")
             SubElement(item, "loc").text = "https://mokatoriagroupfoundation.com" + path
         return Response(tostring(root, encoding="utf-8", xml_declaration=True), mimetype="application/xml")
@@ -275,6 +276,10 @@ def register_routes(app):
     # ---------------------------------------------------------
     # CONTACT
     # ---------------------------------------------------------
+
+    @app.route("/outreach")
+    def outreach():
+        return render_template("outreach.html")
 
     @app.route("/contact")
     def contact():

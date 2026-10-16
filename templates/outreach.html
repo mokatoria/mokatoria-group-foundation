@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Our Outreach & Team — Mokatoria Community Foundation{% endblock %}
+{% block content %}
+<section class="outreach-hero"><div class="container">
+  <span class="eyebrow">People. Presence. Practical support.</span>
+  <h1>Our outreach</h1>
+  <p class="outreach-lead">Mokatoria Community Foundation serves children and families in need through hands-on visits and direct donations.</p>
+  <div class="outreach-jump-links"><a href="#visits">Our visits ↓</a><a href="#leadership">Our leadership ↓</a></div>
+</div></section>
+<section id="visits" class="outreach-section"><div class="container">
+  <div class="section-heading"><div><span class="eyebrow">Where we have served</span><h2>Small acts of care, shared across communities.</h2></div><p>Our outreach has included visits to children’s homes in Kenya and India, bringing practical supplies and encouragement.</p></div>
+  <div class="outreach-visits">
+    <article class="outreach-visit"><div class="visit-meta"><span>01 / Kenya</span><time datetime="2023-06-24">24 June 2023</time></div><h3>Kitui, Kenya</h3><p class="visit-home">Kwa Vonza Children’s Home</p><p>On 24 June 2023, our team held a donation drive in Kitui, including a visit to the Kwa Vonza Children’s Home. We distributed clothing, food, and clean water to children and families.</p><div class="visit-tags"><span>Clothing</span><span>Food</span><span>Water</span></div></article>
+    <article class="outreach-visit"><div class="visit-meta"><span>02 / Kenya</span></div><h3>Eldoret, Kenya</h3><p class="visit-home">Huruma Children’s Home</p><p>We visited the Huruma Children’s Home in Eldoret, providing food and clothing to the children in its care.</p><div class="visit-tags"><span>Food</span><span>Clothing</span></div></article>
+    <article class="outreach-visit"><div class="visit-meta"><span>03 / India</span><span>Late 2025</span></div><h3>India</h3><p class="visit-home">University Children Home</p><p>At the end of 2025, we visited the University Children Home in India, bringing food, clothing, and words of encouragement to the children.</p><div class="visit-tags"><span>Food</span><span>Clothing</span><span>Encouragement</span></div></article>
+  </div>
+  <p class="outreach-privacy">We protect the privacy and dignity of the children we serve. Children’s names, faces, and personal information are not published on this outreach page.</p>
+</div></section>
+<section id="leadership" class="outreach-section leadership-section"><div class="container">
+  <div class="section-heading"><div><span class="eyebrow">Our leadership</span><h2>Meet our five-member cabinet.</h2></div><p>The people behind Mokatoria Community Foundation.</p></div>
+  <div class="leadership-grid">
+    {% for name, role in [('Collins', 'Chairperson'), ('Faith Zawadi', 'Treasurer'), ('Benard', 'Secretary'), ('Isaac', 'Supporting Cabinet Member'), ('Alexander Benilous', 'Sponsor & Cabinet Member')] %}
+    <article class="leadership-card"><div class="member-monogram" aria-hidden="true">{{ name[0] }}</div><h3>{{ name }}</h3><p>{{ role }}</p></article>
+    {% endfor %}
+  </div>
+  <div class="foundation-registration"><div><span class="eyebrow">Our foundation</span><h2>Registration & contact</h2><p>Mokatoria Community Foundation is registered with Kenya’s Public Benefit Organizations Regulatory Authority (PBORA).</p><address>Tom Mboya Street, Nairobi, Kenya</address></div><a class="btn-secondary" href="{{ url_for('contact') }}">Contact the foundation →</a></div>
+</div></section>
+<section class="cta-section"><div class="container cta-card"><div><span class="eyebrow eyebrow-light">Support the next visit</span><h2>Help us bring practical support to more communities.</h2></div><a class="btn-light" href="{{ url_for('donate') }}">Ways to give →</a></div></section>
+{% endblock %}

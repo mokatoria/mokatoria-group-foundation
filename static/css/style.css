@@ -376,7 +376,7 @@ button, input, textarea { font: inherit; }
 
 /* Small-screen navigation, with all links available without JavaScript. */
 .mobile-menu-toggle { display: none; }
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
   .nav-inner { flex-wrap: wrap; gap: 12px; padding-top: 14px; padding-bottom: 14px; }
   .main-nav { width: 100%; flex-wrap: wrap; gap: 10px 20px; padding: 12px 0; }
   .main-nav a:not(.btn-nav) { display: block; }
@@ -457,7 +457,33 @@ button, input, textarea { font: inherit; }
 .translation-choices button { display: block; padding: 9px 14px; border-radius: 8px; text-decoration: none; color: var(--green-950); font-size: .9rem; }
 .translation-choices button:hover { background: var(--green-100); }
 @media (min-width: 901px) { .site-header .nav-inner { gap: 14px; } .site-header .main-nav { gap: 12px; } }
-@media (max-width: 900px) { .translation-menu { margin-left: auto; order: 0; }.mobile-menu-toggle { order: 1; }.main-nav { order: 2; } }
+@media (max-width: 1100px) { .translation-menu { margin-left: auto; order: 0; }.mobile-menu-toggle { order: 1; }.main-nav { order: 2; } }
 
 .translation-choices button { width: 100%; text-align: start; border: 0; background: transparent; cursor: pointer; font-family: inherit; }
 .translation-choices button[aria-current="true"] { background: var(--green-100); font-weight: 700; }
+
+/* Outreach stories and foundation leadership */
+.outreach-hero { padding: 70px 0 58px; background: radial-gradient(circle at 85% 10%, var(--green-100), transparent 45%), var(--cream); }
+.outreach-hero h1 { font-family: 'Playfair Display', Georgia, serif; font-size: clamp(3rem,6vw,5rem); color: var(--green-950); line-height: 1.1; margin: 16px 0 22px; }
+.outreach-lead { max-width: 710px; font-size: 1.15rem; color: var(--muted); line-height: 1.8; }
+.outreach-jump-links { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 28px; color: var(--green-700); font-weight: 700; }
+.outreach-section { padding: 70px 0; scroll-margin-top: 110px; }
+.outreach-visits { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 22px; }
+.outreach-visit { border: 1px solid var(--line); border-radius: 22px; padding: 28px; background: var(--paper); display: flex; flex-direction: column; }
+.visit-meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; color: var(--green-700); font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; min-height: 26px; }
+.outreach-visit h3 { font-size: 1.55rem; margin: 18px 0 6px; color: var(--green-950); }
+.outreach-visit .visit-home { font-size: .85rem; font-weight: 700; color: var(--green-700); margin: 0 0 12px; }
+.outreach-visit p { font-size: .92rem; line-height: 1.85; color: var(--muted); }
+.visit-tags { margin-top: auto; padding-top: 18px; display: flex; flex-wrap: wrap; gap: 8px; }
+.visit-tags span { padding: 5px 10px; border-radius: 20px; font-size: .72rem; color: var(--green-900); background: var(--green-100); }
+.outreach-privacy { color: var(--muted); font-size: .8rem; max-width: 850px; margin-top: 24px; }
+.leadership-section { background: var(--green-100); }
+.leadership-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 18px; }
+.leadership-card { padding: 28px; background: var(--paper); border: 1px solid var(--line); border-radius: 20px; }
+.member-monogram { width: 48px; height: 48px; border-radius: 50%; background: var(--green-100); color: var(--green-700); display: grid; place-items: center; font-size: 1.25rem; font-weight: 700; }
+.leadership-card h3 { margin: 20px 0 5px; font-size: 1.15rem; }.leadership-card p { margin: 0; color: var(--muted); font-size: .85rem; }
+.foundation-registration { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 28px; margin-top: 32px; padding: 32px; border: 1px solid #c5d9cc; border-radius: 22px; }
+.foundation-registration > div { max-width: 690px; }.foundation-registration h2 { margin: 10px 0; font-size: 1.4rem; }.foundation-registration address { font-style: normal; color: var(--muted); }
+.outreach-project-link { padding-top: 24px; color: var(--green-700); font-size: .85rem; }
+@media(max-width:900px) { .outreach-visits, .leadership-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media(max-width:600px) { .outreach-visits, .leadership-grid { grid-template-columns: 1fr; }.outreach-hero { padding: 48px 0 35px; }.outreach-section { padding: 48px 0; }.outreach-visit, .leadership-card, .foundation-registration { padding: 24px; } }

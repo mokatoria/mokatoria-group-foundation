@@ -31,7 +31,7 @@ def client(app):
     return app.test_client()
 
 
-@pytest.mark.parametrize('path', ['/', '/projects', '/donate', '/contact'])
+@pytest.mark.parametrize('path', ['/', '/projects', '/donate', '/contact', '/outreach'])
 def test_public_identity_and_search_metadata(client, path):
     response = client.get(path)
     assert response.status_code == 200
@@ -62,7 +62,7 @@ def test_external_payment_details_and_no_false_confirmation(client, app):
 def test_sitemap_and_robots(client):
     root = ElementTree.fromstring(client.get('/sitemap.xml').data)
     urls = {item[0].text for item in root}
-    assert urls == {'https://mokatoriagroupfoundation.com' + path for path in ['/', '/projects', '/donate', '/contact']}
+    assert urls == {'https://mokatoriagroupfoundation.com' + path for path in ['/', '/projects', '/donate', '/contact', '/outreach']}
     assert b'Sitemap: https://mokatoriagroupfoundation.com/sitemap.xml' in client.get('/robots.txt').data
 
 
@@ -156,7 +156,7 @@ def test_invalid_manual_records_are_not_saved(client, app, changes):
 
 def test_translation_only_public_pages_and_safe_urls(client):
     from urllib.parse import urlparse, parse_qs
-    for page, path in [('index','/'), ('donate','/donate'), ('contact','/contact'), ('projects','/projects')]:
+    for page, path in [('index','/'), ('donate','/donate'), ('contact','/contact'), ('projects','/projects'), ('outreach','/outreach')]:
         html = client.get(path).get_data(as_text=True)
         assert 'aria-label="Translate website"' in html and 'Kiswahili' in html
         assert 'Language / Lugha' not in html and 'Automatic translation' not in html
@@ -184,3 +184,14 @@ def test_language_choices_cannot_be_rewritten_as_proxy_links(client):
     assert 'js/language-switcher.js' in html
     menu = html.split('class="translation-choices"',1)[1].split('</div>',1)[0]
     assert '<a ' not in menu and 'target="_blank"' not in menu
+
+
+def test_outreach_content_and_privacy(client):
+    response = client.get('/outreach')
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    for phrase in ['Kwa Vonza', 'Huruma', 'University Children Home', '24 June 2023', 'Late 2025', 'Faith Zawadi', 'Alexander Benilous', 'PBORA']:
+        assert phrase in html
+    assert '<img' not in html
+    assert 'Nairobi, Kenya' in html
+    assert 'data-public-url="https://mokatoriagroupfoundation.com/outreach"' in html
