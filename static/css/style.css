@@ -452,9 +452,12 @@ button, input, textarea { font: inherit; }
 .translation-menu summary { display: grid; place-items: center; width: 42px; height: 42px; border: 1px solid var(--line); border-radius: 50%; color: var(--green-900); background: var(--paper); cursor: pointer; list-style: none; }
 .translation-menu summary::-webkit-details-marker { display: none; }
 .translation-menu summary:hover, .translation-menu[open] summary { background: var(--green-100); }
-.translation-menu summary:focus-visible, .translation-choices a:focus-visible { outline: 3px solid var(--green-600); outline-offset: 2px; }
+.translation-menu summary:focus-visible, .translation-choices button:focus-visible { outline: 3px solid var(--green-600); outline-offset: 2px; }
 .translation-choices { position: absolute; top: calc(100% + 12px); right: 0; width: 220px; max-height: min(420px, 65vh); overflow-y: auto; background: var(--paper); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); padding: 8px; z-index: 50; }
-.translation-choices a { display: block; padding: 9px 14px; border-radius: 8px; text-decoration: none; color: var(--green-950); font-size: .9rem; }
-.translation-choices a:hover { background: var(--green-100); }
+.translation-choices button { display: block; padding: 9px 14px; border-radius: 8px; text-decoration: none; color: var(--green-950); font-size: .9rem; }
+.translation-choices button:hover { background: var(--green-100); }
 @media (min-width: 901px) { .site-header .nav-inner { gap: 14px; } .site-header .main-nav { gap: 12px; } }
 @media (max-width: 900px) { .translation-menu { margin-left: auto; order: 0; }.mobile-menu-toggle { order: 1; }.main-nav { order: 2; } }
+
+.translation-choices button { width: 100%; text-align: start; border: 0; background: transparent; cursor: pointer; font-family: inherit; }
+.translation-choices button[aria-current="true"] { background: var(--green-100); font-weight: 700; }

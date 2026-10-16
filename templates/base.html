@@ -40,14 +40,14 @@
         <span translate="no" class="notranslate">Mokatoria Community Foundation</span>
       </a>
       {% if public_search_page %}
-      <details class="translation-menu" translate="no">
+      <details class="translation-menu notranslate" translate="no" data-public-url="{{ canonical_url }}">
         <summary aria-label="Translate website" title="Translate website">
           <svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h12M9 3v2M6 5c0 6 5 10 8 11M13 5C12 10 8 14 3 16M14 21l4-10 4 10M15.5 17h5"/></svg>
         </summary>
         <div class="translation-choices" aria-label="Choose a language">
-          <a href="{{ url_for(request.endpoint) }}" lang="en">English</a>
-          {% for code, label in translation_languages %}<a href="{{ url_for('translate_page', page=request.endpoint, language=code) }}" lang="{{ code }}" target="_blank" rel="noopener noreferrer">{{ label }}</a>{% endfor %}
-          <a href="{{ url_for('translate_page', page=request.endpoint, language='more') }}" target="_blank" rel="noopener noreferrer">More languages…</a>
+          <button type="button" data-language="en" lang="en">English</button>
+          {% for code, label in translation_languages %}<button type="button" data-language="{{ code }}" lang="{{ code }}">{{ label }}</button>{% endfor %}
+          <button type="button" data-language="more">More languages…</button>
         </div>
       </details>
       {% endif %}
@@ -140,5 +140,6 @@
   });
 })();
 </script>
+{% if public_search_page %}<script src="{{ url_for('static', filename='js/language-switcher.js') }}" defer></script>{% endif %}
 </body>
 </html>

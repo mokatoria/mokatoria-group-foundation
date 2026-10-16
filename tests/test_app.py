@@ -166,11 +166,21 @@ def test_translation_only_public_pages_and_safe_urls(client):
         assert dest.hostname == 'translate.google.com'
         assert parse_qs(dest.query)['u'] == ['https://mokatoriagroupfoundation.com'+path]
         assert 'private' not in response.headers['Location']
-    assert '<details class="translation-menu"' not in client.get('/admin/login').get_data(as_text=True)
+    assert '<details class="translation-menu' not in client.get('/admin/login').get_data(as_text=True)
     admin_form(client)
-    assert '<details class="translation-menu"' not in client.get('/admin/donations/new').get_data(as_text=True)
+    assert '<details class="translation-menu' not in client.get('/admin/donations/new').get_data(as_text=True)
     assert client.get('/translate?page=admin_donations&language=sw').status_code == 400
     assert client.get('/translate?page=https://evil.example&language=sw').status_code == 400
     assert client.get('/translate?language=invalid').status_code == 400
     assert client.get('/translate?language=en&page=donate').headers['Location'] == '/donate'
     assert 'translate="no"' in client.get('/donate').get_data(as_text=True)
+
+
+def test_language_choices_cannot_be_rewritten_as_proxy_links(client):
+    html = client.get('/contact').get_data(as_text=True)
+    assert 'data-public-url="https://mokatoriagroupfoundation.com/contact"' in html
+    assert '<button type="button" data-language="en" lang="en">English</button>' in html
+    assert '<button type="button" data-language="sw"' in html
+    assert 'js/language-switcher.js' in html
+    menu = html.split('class="translation-choices"',1)[1].split('</div>',1)[0]
+    assert '<a ' not in menu and 'target="_blank"' not in menu
