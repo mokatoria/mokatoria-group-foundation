@@ -29,6 +29,7 @@ from werkzeug.security import check_password_hash
 from config import Config
 from extensions import db
 from models import Donation
+from login_protection import reserve_login_attempt, reset_login_attempts
 from forms import DonationForm, RecordPaymentForm
 from datetime import datetime, timezone
 from sqlalchemy.exc import IntegrityError
@@ -204,6 +205,11 @@ def register_routes(app):
 
         if request.method == "POST":
 
+            retry_after = reserve_login_attempt()
+            if retry_after:
+                flash("Too many sign-in attempts. Please wait up to 15 minutes before trying again.", "error")
+                return render_template("admin_login.html"), 429, {"Retry-After": str(retry_after)}
+
             username = request.form.get(
                 "username",
                 "",
@@ -227,6 +233,7 @@ def register_routes(app):
             )
 
             if valid_username and valid_password:
+                reset_login_attempts()
                 session.clear()
                 session["admin_logged_in"] = True
                 session["admin_username"] = username

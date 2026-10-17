@@ -208,7 +208,7 @@ def test_donor_information_links_and_accurate_limits(client):
     assert 'review requests individually' in giving
     assert 'personal accounts held by Collins Mokaya Onyancha' in giving
     assert 'does not establish tax deductibility' in giving
-    assert '16 October 2026' in privacy and '16 October 2026' in giving
+    assert '17 October 2026' in privacy and '16 October 2026' in giving
     assert 'X-Robots-Tag' not in client.get('/donation-information').headers
 
 
@@ -233,3 +233,59 @@ def test_server_error_rolls_back_and_offers_safe_retry(app):
     html = response.get_data(as_text=True)
     assert 'check your donation records before trying again' in html
     assert 'private diagnostic detail' not in html
+
+
+def login_token(client):
+    html = client.get('/admin/login').get_data(as_text=True)
+    return re.search(r'name="csrf_token"[^>]*value="([^"]+)"', html).group(1)
+
+
+def test_admin_login_budget_is_shared_and_ignores_spoofed_ip(app):
+    from werkzeug.security import generate_password_hash
+    app.config.update(ADMIN_USERNAME='owner', ADMIN_PASSWORD_HASH=generate_password_hash('test-only-password'))
+    first = app.test_client()
+    token = login_token(first)
+    for n in range(5):
+        response = first.post('/admin/login', data={'csrf_token': token, 'username': 'unknown', 'password': 'wrong'},
+                              headers={'X-Forwarded-For': f'192.0.2.{n}'})
+        assert response.status_code == 200
+    second = app.test_client()
+    response = second.post('/admin/login', data={'csrf_token': login_token(second), 'username': 'owner', 'password': 'test-only-password'})
+    assert response.status_code == 429
+    assert 1 <= int(response.headers['Retry-After']) <= 900
+    assert response.headers['Cache-Control'] == 'no-store'
+    with second.session_transaction() as session:
+        assert not session.get('admin_logged_in')
+
+
+def test_login_budget_expires_without_extending_lockout(app):
+    from login_protection import reserve_login_attempt
+    with app.app_context():
+        for _ in range(5):
+            assert reserve_login_attempt(now=1000) == 0
+        assert reserve_login_attempt(now=1100) == 800
+        assert reserve_login_attempt(now=1800) == 100
+        assert reserve_login_attempt(now=1900) == 0
+
+
+def test_successful_login_resets_budget_and_csrf_failures_do_not_use_it(app):
+    from werkzeug.security import generate_password_hash
+    from login_protection import AdminLoginBudget
+    app.config.update(ADMIN_USERNAME='owner', ADMIN_PASSWORD_HASH=generate_password_hash('test-only-password'))
+    client = app.test_client()
+    assert client.post('/admin/login', data={'username': 'owner', 'password': 'wrong'}).status_code == 400
+    with app.app_context():
+        assert db.session.get(AdminLoginBudget, 'admin') is None
+    token = login_token(client)
+    for _ in range(4):
+        client.post('/admin/login', data={'csrf_token': token, 'username': 'owner', 'password': 'wrong'})
+    result = client.post('/admin/login', data={'csrf_token': token, 'username': 'owner', 'password': 'test-only-password'})
+    assert result.status_code == 302 and result.location.endswith('/admin/donations')
+    with app.app_context():
+        assert db.session.get(AdminLoginBudget, 'admin').attempts == 0
+
+
+def test_privacy_describes_current_storage(client):
+    html = client.get('/privacy').get_data(as_text=True)
+    assert 'Neon stores' in html and 'Google Drive' in html
+    assert '17 October 2026' in html

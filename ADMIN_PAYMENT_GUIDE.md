@@ -11,3 +11,8 @@ The dashboard totals each currency separately, excludes test/demo payments, and 
 Duplicate transaction references are blocked within each receiving account, including differences in capitalization or surrounding spaces. Separate real transactions must have their own reference. There is no automatic payment-provider reconciliation, editing, or deletion in this release. Verify entries carefully before saving.
 
 The database update adds nullable tracking fields and a unique reference index without removing old records. Admin pages require authentication, keep CSRF protection, and return no-store / noindex headers. Do not share administrator credentials or receipt-page links with donors.
+
+
+## Administrator sign-in protection
+
+Five unsuccessful sign-in attempts fill a shared 15-minute attempt window. Further attempts return a temporary wait message, even from another browser. Wait until that window ends before trying again. A successful sign-in resets the attempt counter. The shared limit protects this single-admin site without relying on spoofable forwarded IP headers; it also means another visitor can temporarily exhaust the login allowance. An already signed-in administrator can keep working. The database retains the counter across restarts.
