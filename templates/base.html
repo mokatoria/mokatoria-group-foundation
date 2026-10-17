@@ -21,7 +21,7 @@
     "@context": "https://schema.org", "@type": "Organization",
     "name": "Mokatoria Community Foundation",
     "url": "https://mokatoriagroupfoundation.com/",
-    "logo": "https://mokatoriagroupfoundation.com/static/favicon.png",
+    "logo": "https://mokatoriagroupfoundation.com/static/foundation-logo.png",
     "email": "mokatoriafoundation@gmail.com", "telephone": "+254743563077",
     "address": {"@type": "PostalAddress", "streetAddress": "Tom Mboya Street", "addressLocality": "Nairobi", "addressCountry": "KE"}
   }|tojson }}</script>
@@ -36,7 +36,7 @@
   <header class="site-header">
     <div class="container nav-inner">
       <a class="brand" href="{{ url_for('index') }}" aria-label="Mokatoria Community Foundation home">
-        <span class="brand-mark">+</span>
+        <img class="brand-mark" src="{{ url_for('static', filename='favicon.svg') }}" alt="" width="30" height="30">
         <span translate="no" class="notranslate">Mokatoria Community Foundation</span>
       </a>
       {% if public_search_page %}
@@ -82,7 +82,7 @@
   <footer class="site-footer">
     <div class="container footer-grid">
       <div>
-        <a class="brand footer-brand" href="{{ url_for('index') }}"><span class="brand-mark">+</span><span translate="no" class="notranslate">Mokatoria Community Foundation</span></a>
+        <a class="brand footer-brand" href="{{ url_for('index') }}"><img class="brand-mark" src="{{ url_for('static', filename='favicon.svg') }}" alt="" width="30" height="30"><span translate="no" class="notranslate">Mokatoria Community Foundation</span></a>
         <p>Uplifting children and families by strengthening the foundations of a dignified life: clean water, nourishing food, education and mental wellbeing.</p>
       </div>
       <div class="footer-links">

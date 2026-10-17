@@ -193,7 +193,7 @@ def test_outreach_content_and_privacy(client):
     html = response.get_data(as_text=True)
     for phrase in ['Kwa Vonza', 'Huruma', 'University Children Home', '24 June 2023', 'Late 2025', 'Faith Zawadi', 'Alexander Benilous', 'PBORA']:
         assert phrase in html
-    assert '<img' not in html
+    assert '<img' not in html.split('<main>', 1)[1].split('</main>', 1)[0]
     assert 'Nairobi, Kenya' in html
     assert 'data-public-url="https://mokatoriagroupfoundation.com/outreach"' in html
 
