@@ -410,12 +410,14 @@ button, input, textarea { font: inherit; }
 @media (max-width: 900px) { .foundation-contact-grid { grid-template-columns: 1fr; } }
 @media (max-width: 480px) { .site-header .brand { max-width: 210px; font-size: .85rem; } .foundation-contact { padding: 48px 0 60px; } .contact-detail-card, .donation-contact-note { padding: 22px; } }
 
-/* Illustrated mission cards: consistent full-width images, with copy below. */
+/* Real mission photos: edge-to-edge square frames, with subject-aware crops. */
 .pillar-grid-photos { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px; }
 .pillar-card-photo { padding: 0; overflow: hidden; min-height: 0; background: var(--paper); }
-.pillar-photo-frame { position: relative; isolation: isolate; overflow: hidden; aspect-ratio: 4 / 3; background: #173c30; }
-.pillar-photo-frame::before { content: ""; position: absolute; inset: -28px; z-index: -1; background-image: var(--pillar-photo); background-size: cover; background-position: center; filter: blur(22px); opacity: .42; }
-.pillar-card-photo .pillar-image { display: block; width: 100%; height: 100%; object-fit: contain; filter: brightness(1.06) contrast(1.04) saturate(1.02); }
+.pillar-photo-frame { overflow: hidden; aspect-ratio: 1; background: var(--cream); }
+.pillar-card-photo .pillar-image { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; filter: brightness(1.06) contrast(1.04) saturate(1.02); }
+.pillar-card-photo:nth-child(1) .pillar-image { object-position: center 20%; }
+.pillar-card-photo:nth-child(3) .pillar-image { object-position: 35% center; }
+.pillar-card-photo:nth-child(4) .pillar-image { object-position: center 15%; }
 .pillar-body { padding: 24px 26px 28px; }
 .pillar-kicker { display: block; color: var(--green-700); text-transform: uppercase; letter-spacing: .1em; font-size: .65rem; font-weight: 700; margin-bottom: 12px; }
 .pillar-card-photo h3 { font-size: 1.35rem; }
