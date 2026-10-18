@@ -150,7 +150,7 @@ def register_routes(app):
             "outreach": "Explore Mokatoria Community Foundation outreach in Kitui, Eldoret and India, and meet our five-member leadership team.",
             "index": "Mokatoria Community Foundation supports children and families through clean water, food, education, and mental wellbeing. Based in Nairobi, Kenya.",
             "projects": "Explore the community projects of Mokatoria Community Foundation in water, nutrition, education, and mental wellbeing.",
-            "donate": "Support Mokatoria Community Foundation through PayPal or a KES bank transfer. View receiving details and contact us to confirm your contribution.",
+            "donate": "Support Mokatoria Community Foundation through PayPal or a KES bank transfer. Request bank-transfer instructions privately and contact us to confirm your contribution.",
             "contact": "Contact Mokatoria Community Foundation at mokatoriafoundation@gmail.com or +254 743 563 077. Find us on Tom Mboya Street, Nairobi, Kenya.",
         }
         canonical = "https://mokatoriagroupfoundation.com" + request.path if request.endpoint in public_pages else None
@@ -341,7 +341,7 @@ def register_routes(app):
 
         # Payments are made externally and confirmed manually, never by a browser return.
         if request.method == "POST":
-            flash("Please use the PayPal or bank-transfer instructions below.", "info")
+            flash("Please use PayPal or request bank-transfer instructions below.", "info")
             return redirect(url_for("donate"), code=303)
         return render_template("donate.html")
 

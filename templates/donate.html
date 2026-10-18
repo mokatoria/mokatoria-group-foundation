@@ -21,50 +21,13 @@
       <p>Review the recipient, amount, currency, and any fees in PayPal before sending.</p>
       <a class="btn-primary btn-full" href="https://www.paypal.com/" target="_blank" rel="noopener noreferrer">Open PayPal →</a>
       </div>
-      <details class="payment-option bank-option">
-        <summary>
-          <span class="bank-symbol" aria-hidden="true">↗</span>
-          <span class="bank-heading"><strong>Equity Bank · Kenya</strong><small>View bank-transfer details · KES</small></span>
-          <span class="bank-chevron" aria-hidden="true">⌄</span>
-        </summary>
-        <div class="bank-content">
-      <h3>Transfer details</h3>
-      <dl class="bank-details">
-        <dt>Account holder</dt><dd translate="no" class="notranslate">Collins Mokaya Onyancha</dd>
-        <dt>Bank</dt><dd translate="no" class="notranslate">Equity Bank</dd>
-        <dt>Branch</dt><dd translate="no" class="notranslate">Eldoret Market Branch</dd>
-        <dt>Account number</dt><dd translate="no" class="notranslate">7770179484119</dd>
-        <dt>Bank code</dt><dd translate="no" class="notranslate">68</dd>
-        <dt>Branch code</dt><dd translate="no" class="notranslate">109</dd>
-        <dt>SWIFT/BIC</dt><dd translate="no" class="notranslate">EQBLKENA</dd>
-        <dt>Account currency</dt><dd translate="no" class="notranslate">KES (Kenyan shillings)</dd>
-      </dl>
-      <p><strong>Before transferring:</strong> the account receives KES (Kenyan shillings). For international transfers, ask your bank about conversion, fees, and any additional receiving-bank requirements.</p>
-      <p>Keep your payment reference. You can contact us with the reference, date, amount, and currency so we can locate your contribution.</p>
-      <a class="bank-contact" href="{{ url_for('contact') }}">Contact us about your donation →</a>
-        </div>
-      </details>
-      <details class="payment-option bank-option neema-option">
-        <summary>
-          <span class="bank-symbol" aria-hidden="true">↗</span>
-          <span class="bank-heading"><strong>Neema · Israel</strong><small>View local transfer details · Israeli banks only</small></span>
-          <span class="bank-chevron" aria-hidden="true">⌄</span>
-        </summary>
-        <div class="bank-content">
-          <h3>Local transfer details</h3>
-          <dl class="bank-details">
-            <dt>Account holder</dt><dd translate="no" class="notranslate">Collins mokaya Onyancha</dd>
-            <dt>Provider</dt><dd translate="no" class="notranslate">Neema</dd>
-            <dt>Bank / identification code</dt><dd translate="no" class="notranslate">21</dd>
-            <dt>Branch</dt><dd translate="no" class="notranslate">21</dd>
-            <dt>Account number</dt><dd translate="no" class="notranslate">00151432</dd>
-          </dl>
-          <p><strong>Transfers from Israeli banks only.</strong> Neema states that these account details cannot receive bank transfers from abroad.</p>
-          <p><strong>Currency:</strong> for an ILS (Israeli shekel) transfer, confirm the receiving currency in your banking app. Before sending USD (US dollars), confirm the correct deposit instructions directly with Neema. A USD balance does not confirm that these details accept USD bank transfers.</p>
-          <p>This is the personal receiving account of Collins Mokaya Onyancha. Contributions are confirmed manually after receipt.</p>
-          <a class="bank-contact" href="https://help.getneema.com/en/articles/16288559-deposit-via-bank-transfer-to-my-neema-account" target="_blank" rel="noopener noreferrer">Read Neema’s bank-transfer instructions ↗</a>
-        </div>
-      </details>
+      <div class="payment-option bank-option">
+        <h3>Bank transfer</h3>
+        <p>To donate by bank transfer, request the receiving instructions privately. Tell us the country you are sending from and your preferred currency so we can provide the appropriate details.</p>
+        <a class="btn-primary btn-full" href="mailto:mokatoriafoundation@gmail.com?subject=Request%20bank-transfer%20instructions">Request bank-transfer instructions →</a>
+        <p><a href="{{ url_for('contact') }}">Other ways to contact us</a></p>
+        <p>After transferring, keep your payment reference. We confirm contributions after checking the receiving account.</p>
+      </div>
       <p class="payment-footer">Read our <a href="{{ url_for('donation_information') }}">donation information</a> and <a href="{{ url_for('privacy') }}">privacy notice</a>.</p>
       <p class="payment-footer">Thank you for making a lasting difference.</p>
     </div>
